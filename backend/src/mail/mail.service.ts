@@ -23,4 +23,13 @@ export class MailService {
             html: `<p>Click <a href="${verifyUrl}"> here </a> to verify your account</p>`,
         })
     }
+    async sendForgotPasswordMail(email: string, token: string) : Promise<void> {
+        const resetPasswordUrl = `${this._configService.get('APP_URL')}/auth/validPasswordToken?token=${token}&email=${email}`;
+        await this.transporter.sendMail({
+            from: this._configService.get('GMAIL_USER'),
+            to: email,
+            subject: 'Reset your password',
+            html: `<p>Click <a href="${resetPasswordUrl}"> here </a> to reset your password</p>`,
+        })
+    }
 }
