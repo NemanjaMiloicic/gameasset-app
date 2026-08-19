@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: gameasset-db
+    restart: always
+    environment:
+      POSTGRES_USER: gameasset
+      POSTGRES_PASSWORD: gameasset123
+      POSTGRES_DB: gameasset_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
