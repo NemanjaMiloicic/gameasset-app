@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Request, UseGuards, UploadedFiles, UseInterceptors, HttpCode, HttpStatus } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Request, UseGuards, UploadedFiles, UseInterceptors, HttpCode, HttpStatus, UploadedFile } from "@nestjs/common";
 import { AssetService } from "./asset.service";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/shared/guards/roles.guard";
@@ -6,7 +6,7 @@ import { Roles } from "src/shared/decorators/roles.decorator";
 import { UserRole } from "src/shared/enums/user-role.enum";
 import { CreateAssetDto } from "./dtos/create-asset.dto";
 import { IdDto } from "src/shared/dtos/id.dto";
-import { FilesInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller('assets')
 export class AssetController {
@@ -42,5 +42,17 @@ export class AssetController {
         @UploadedFiles() files: Array<Express.Multer.File>,
     ) {
         return this._assetService.addFiles(params, files);
+    }
+
+    @Put(':id/preview')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.AUTHOR, UserRole.ADMIN)
+    @UseInterceptors(FileInterceptor('preview'))
+    async addPreviewImage(
+        @Param() params: IdDto,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        return this._assetService.updatePreviewImage(params, file);
     }
 }

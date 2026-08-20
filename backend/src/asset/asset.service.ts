@@ -80,4 +80,19 @@ export class AssetService {
 
         return this.findOne(idDto);
     }
+
+    async updatePreviewImage(idDto: IdDto, file: Express.Multer.File): Promise<AssetEntity> {
+    const asset = await this.findOne(idDto);
+
+    const path = `previews/${asset.id}/${Date.now()}-${file.originalname}`;
+    const previewUrl = await this._supabaseService.uploadFile(
+        path,
+        file.buffer,
+        file.mimetype,
+    );
+
+    asset.previewImageUrl = previewUrl;
+    return this._assetRepo.save(asset);
+}
+
 }
