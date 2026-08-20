@@ -34,7 +34,7 @@ export class AuthController {
 
     @Get('verify')
     @HttpCode(HttpStatus.OK)
-    async verify(@Query('token') query: TokenDto) {
+    async verify(@Query() query: TokenDto) {
         return this._authService.verifyEmail(query);
     }
 

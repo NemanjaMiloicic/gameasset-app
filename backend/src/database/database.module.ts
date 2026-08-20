@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { AssetFilesEntity } from "src/shared/entities/asset-file.entity";
+import { AssetEntity } from "src/shared/entities/asset.entity";
 import { UserEntity } from "src/shared/entities/user.entity";
 
 @Module({
@@ -14,7 +16,7 @@ import { UserEntity } from "src/shared/entities/user.entity";
                 username: config.get('DB_USERNAME'),
                 password: config.get('DB_PASSWORD'),
                 database: config.get('DB_NAME'),
-                entities: [UserEntity],
+                entities: [UserEntity, AssetEntity, AssetFilesEntity],
                 synchronize: true
             }),
         }),
