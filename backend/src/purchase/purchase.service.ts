@@ -1,9 +1,10 @@
-import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AssetService } from "src/asset/asset.service";
 import { CurrentUserDto } from "src/shared/current-user.dto";
 import { IdDto } from "src/shared/dtos/id.dto";
 import { PaginationDto } from "src/shared/dtos/pagination.dto";
+import { AssetEntity } from "src/shared/entities/asset.entity";
 import { PurchaseEntity } from "src/shared/entities/purchase.entity";
 import { UserEntity } from "src/shared/entities/user.entity";
 import { Repository } from "typeorm";
@@ -42,14 +43,27 @@ export class PurchaseService {
     }
 
     async findMyPurchases(currentUserDto: CurrentUserDto, paginationDto: PaginationDto): Promise<{ data: PurchaseEntity[]; total: number }> {
-    const [data, total] = await this._purchaseRepo.findAndCount({
-        where: { buyer: { id: currentUserDto.id } },
-        relations: { asset: { author: true, files: true } },
-        order: { purchasedAt: 'DESC' },
-        skip: paginationDto.skip,
-        take: paginationDto.limit,
-    });
+        const [data, total] = await this._purchaseRepo.findAndCount({
+            where: { buyer: { id: currentUserDto.id } },
+            relations: { asset: { author: true, files: true } },
+            order: { purchasedAt: 'DESC' },
+            skip: paginationDto.skip,
+            take: paginationDto.limit,
+        });
 
-    return { data, total };
-}
+        return { data, total };
+    }
+
+    async getDownloadableAsset(idDto: IdDto, currentUser: CurrentUserDto): Promise<AssetEntity> {
+        const purchase = await this._purchaseRepo.findOne({
+            where: { id: idDto.id, buyer: { id: currentUser.id } },
+            relations: { asset: { files: true } },
+        });
+
+        if (!purchase) {
+            throw new NotFoundException('Purchase not found');
+        }
+
+        return purchase.asset;
+    }
 }
