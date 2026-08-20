@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AssetEntity } from "src/shared/entities/asset.entity";
 import { Repository } from "typeorm";
@@ -8,6 +8,9 @@ import { UserService } from "src/user/user.service";
 import { SupabaseService } from "src/supabase/supabase.service";
 import 'multer';
 import { AssetFilesEntity } from "src/shared/entities/asset-file.entity";
+import { UpdateAssetDto } from "./dtos/update-asset.dto";
+import { CurrentUserDto } from "./dtos/current-user.dto";
+import { UserRole } from "src/shared/enums/user-role.enum";
 
 @Injectable()
 export class AssetService {
@@ -82,17 +85,53 @@ export class AssetService {
     }
 
     async updatePreviewImage(idDto: IdDto, file: Express.Multer.File): Promise<AssetEntity> {
-    const asset = await this.findOne(idDto);
+        const asset = await this.findOne(idDto);
 
-    const path = `previews/${asset.id}/${Date.now()}-${file.originalname}`;
-    const previewUrl = await this._supabaseService.uploadFile(
-        path,
-        file.buffer,
-        file.mimetype,
-    );
+        if(asset.previewImageUrl)
+            await this._supabaseService.deleteFileByUrl(asset.previewImageUrl);
 
-    asset.previewImageUrl = previewUrl;
-    return this._assetRepo.save(asset);
+        const path = `previews/${asset.id}/${Date.now()}-${file.originalname}`;
+        const previewUrl = await this._supabaseService.uploadFile(
+            path,
+            file.buffer,
+            file.mimetype,
+        );
+
+        asset.previewImageUrl = previewUrl;
+        return this._assetRepo.save(asset);
+
+    }
+
+    async update(idDto: IdDto, assetDto: UpdateAssetDto, currentUserDto: CurrentUserDto): Promise<AssetEntity> {
+        const asset = await this.findOne(idDto);
+
+        if(asset.author.id !== currentUserDto.id && currentUserDto.userRole!== UserRole.ADMIN)
+            throw new ForbiddenException('You can only edit your own assets');
+
+        Object.assign(asset, assetDto);
+        return await this._assetRepo.save(asset);
+    }
+
+    async remove(idDto: IdDto, currentUserDto: CurrentUserDto) : Promise<void> {
+        const asset = await this.findOne(idDto);
+
+        if(asset.author.id !== currentUserDto.id && currentUserDto.userRole !== UserRole.ADMIN)
+            throw new ForbiddenException('You can only delete your own assets');
+
+        const urlsToDelete: string[] = [];
+
+        if(asset.previewImageUrl) {
+           urlsToDelete.push(asset.previewImageUrl)
+        }
+
+        for(const file of asset.files) {
+            urlsToDelete.push(file.fileUrl)
+        }
+
+        
+        await this._supabaseService.deleteFilesByUrls(urlsToDelete);
+        await this._assetRepo.remove(asset);
+    }
+
 }
 
-}

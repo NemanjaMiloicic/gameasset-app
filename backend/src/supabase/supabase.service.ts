@@ -28,8 +28,20 @@ export class SupabaseService {
         return data.publicUrl;
     }
 
-    async deleteFile(path: string): Promise<void> {
+    async deleteFileByUrl(url: string): Promise<void> {
+        const path = this._extractPathFromUrl(url);
         await this._client.storage.from(this._bucket).remove([path]);
+    }
+
+     async deleteFilesByUrls(urls: string[]): Promise<void> {
+        if (urls.length === 0) return;
+        const paths = urls.map((url) => this._extractPathFromUrl(url));
+        await this._client.storage.from(this._bucket).remove(paths);
+    }
+
+    private _extractPathFromUrl(url: string): string {
+        const marker = `/storage/v1/object/public/${this._bucket}/`;
+        return url.split(marker)[1];
     }
 
 
