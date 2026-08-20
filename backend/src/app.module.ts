@@ -6,6 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { AssetModule } from './asset/asset.module';
+import { PurchaseModule } from './purchase/purchase.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { AssetModule } from './asset/asset.module';
     DatabaseModule,
     UserModule,
     AuthModule,
-    AssetModule
+    AssetModule,
+    PurchaseModule
   ],
   controllers: [AppController],
   providers: [AppService],

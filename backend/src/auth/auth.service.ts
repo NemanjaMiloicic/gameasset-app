@@ -32,9 +32,11 @@ export class AuthService {
 
         const passwordMatches = await bcrypt.compare(dto.password, user.password);
 
-        if(!passwordMatches) {
+        if(!passwordMatches) 
             throw new UnauthorizedException('Invalid credentials');
-        }
+        
+        if(!user.isVerified)
+            throw new UnauthorizedException('Please verify your email before logging in');
         
         return user;
     }

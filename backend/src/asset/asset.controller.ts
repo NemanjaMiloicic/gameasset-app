@@ -8,7 +8,7 @@ import { CreateAssetDto } from "./dtos/create-asset.dto";
 import { IdDto } from "src/shared/dtos/id.dto";
 import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { UpdateAssetDto } from "./dtos/update-asset.dto";
-import { CurrentUserDto } from "./dtos/current-user.dto";
+import { CurrentUserDto } from "../shared/current-user.dto";
 
 @Controller('assets')
 export class AssetController {

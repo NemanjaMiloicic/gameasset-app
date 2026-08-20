@@ -9,7 +9,7 @@ import { SupabaseService } from "src/supabase/supabase.service";
 import 'multer';
 import { AssetFilesEntity } from "src/shared/entities/asset-file.entity";
 import { UpdateAssetDto } from "./dtos/update-asset.dto";
-import { CurrentUserDto } from "./dtos/current-user.dto";
+import { CurrentUserDto } from "../shared/current-user.dto";
 import { UserRole } from "src/shared/enums/user-role.enum";
 
 @Injectable()
