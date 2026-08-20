@@ -59,6 +59,7 @@ export class AssetController {
     }
 
     @Put(':id')
+    @HttpCode(HttpStatus.OK)
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(UserRole.AUTHOR, UserRole.ADMIN)
     async update(

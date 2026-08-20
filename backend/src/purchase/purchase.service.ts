@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { AssetService } from "src/asset/asset.service";
 import { CurrentUserDto } from "src/shared/current-user.dto";
 import { IdDto } from "src/shared/dtos/id.dto";
+import { PaginationDto } from "src/shared/dtos/pagination.dto";
 import { PurchaseEntity } from "src/shared/entities/purchase.entity";
 import { UserEntity } from "src/shared/entities/user.entity";
 import { Repository } from "typeorm";
@@ -17,6 +18,9 @@ export class PurchaseService {
 
     async createFreePurchase(idDto: IdDto, currentUserDto: CurrentUserDto): Promise<PurchaseEntity> {
         const asset = await this._assetService.findOne(idDto);
+
+        if (asset.author.id === currentUserDto.id) 
+            throw new BadRequestException('You cannot purchase your own asset');
 
         if(Number(asset.price) !== 0)
             throw new BadRequestException('This asset is not free, use the paid purchase flow');
@@ -36,4 +40,16 @@ export class PurchaseService {
 
         return await this._purchaseRepo.save(purchaseEntity);
     }
+
+    async findMyPurchases(currentUserDto: CurrentUserDto, paginationDto: PaginationDto): Promise<{ data: PurchaseEntity[]; total: number }> {
+    const [data, total] = await this._purchaseRepo.findAndCount({
+        where: { buyer: { id: currentUserDto.id } },
+        relations: { asset: { author: true, files: true } },
+        order: { purchasedAt: 'DESC' },
+        skip: paginationDto.skip,
+        take: paginationDto.limit,
+    });
+
+    return { data, total };
+}
 }
