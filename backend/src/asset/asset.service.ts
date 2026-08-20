@@ -9,8 +9,9 @@ import { SupabaseService } from "src/supabase/supabase.service";
 import 'multer';
 import { AssetFilesEntity } from "src/shared/entities/asset-file.entity";
 import { UpdateAssetDto } from "./dtos/update-asset.dto";
-import { CurrentUserDto } from "../shared/current-user.dto";
+import { CurrentUserDto } from "../shared/dtos/current-user.dto";
 import { UserRole } from "src/shared/enums/user-role.enum";
+import { PaginationDto } from "src/shared/dtos/pagination.dto";
 
 @Injectable()
 export class AssetService {
@@ -132,6 +133,20 @@ export class AssetService {
         await this._supabaseService.deleteFilesByUrls(urlsToDelete);
         await this._assetRepo.remove(asset);
     }
+
+    async findMyAssets(currentUserDto: CurrentUserDto, paginationDto: PaginationDto) : Promise<{data: AssetEntity[]; total: number}>  {
+        const [data, total] = await this._assetRepo.findAndCount({
+            where: {author: {id: currentUserDto.id}},
+            relations: {files: true},
+            order: {createdAt: 'DESC'},
+            skip: paginationDto.skip,
+            take: paginationDto.limit,
+        });
+
+        return {data, total};
+    }
+
+
 
 }
 

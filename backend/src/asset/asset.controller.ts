@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Request, UseGuards, UploadedFiles, UseInterceptors, HttpCode, HttpStatus, UploadedFile, Delete } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Request, UseGuards, UploadedFiles, UseInterceptors, HttpCode, HttpStatus, UploadedFile, Delete, Query } from "@nestjs/common";
 import { AssetService } from "./asset.service";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/shared/guards/roles.guard";
@@ -8,7 +8,8 @@ import { CreateAssetDto } from "./dtos/create-asset.dto";
 import { IdDto } from "src/shared/dtos/id.dto";
 import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { UpdateAssetDto } from "./dtos/update-asset.dto";
-import { CurrentUserDto } from "../shared/current-user.dto";
+import { CurrentUserDto } from "../shared/dtos/current-user.dto";
+import { PaginationDto } from "src/shared/dtos/pagination.dto";
 
 @Controller('assets')
 export class AssetController {
@@ -26,6 +27,15 @@ export class AssetController {
     @HttpCode(HttpStatus.OK)
     async findAll() {
         return this._assetService.findAll();
+    }
+
+    @Get('my')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.AUTHOR, UserRole.ADMIN)
+    async findMyPurchases(@Query() query: PaginationDto, @Request() req) {
+        const currentUserDto: CurrentUserDto = {id: req.user.id, userRole: req.user.userRole};
+        return this._assetService.findMyAssets(currentUserDto, query);
     }
 
     @Get(':id')

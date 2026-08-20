@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AssetService } from "src/asset/asset.service";
-import { CurrentUserDto } from "src/shared/current-user.dto";
+import { CurrentUserDto } from "src/shared/dtos/current-user.dto";
 import { IdDto } from "src/shared/dtos/id.dto";
 import { PaginationDto } from "src/shared/dtos/pagination.dto";
 import { AssetEntity } from "src/shared/entities/asset.entity";

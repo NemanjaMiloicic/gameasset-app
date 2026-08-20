@@ -2,7 +2,7 @@ import { Controller, Param, Post, UseGuards, Request, Get, Query, HttpCode, Http
 import { PurchaseService } from "./purchase.service";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { IdDto } from "src/shared/dtos/id.dto";
-import { CurrentUserDto } from "src/shared/current-user.dto";
+import { CurrentUserDto } from "src/shared/dtos/current-user.dto";
 import { PaginationDto } from "src/shared/dtos/pagination.dto";
 import type { Response } from "express";
 import { ZipArchive } from "archiver";
