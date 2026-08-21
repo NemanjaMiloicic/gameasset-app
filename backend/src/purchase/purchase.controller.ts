@@ -1,4 +1,4 @@
-import { Controller, Param, Post, UseGuards, Request, Get, Query, HttpCode, HttpStatus, Res } from "@nestjs/common";
+import { Controller, Param, Post, UseGuards, Request, Get, Query, HttpCode, HttpStatus, Res, Req, Headers } from "@nestjs/common";
 import { PurchaseService } from "./purchase.service";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { IdDto } from "src/shared/dtos/id.dto";
@@ -10,10 +10,17 @@ import axios from "axios";
 import { LicenseType } from "src/shared/enums/license-type.enum";
 import { LicenseDataDto } from "src/shared/dtos/license-data.dto";
 import { LicenseService } from "src/license/license.service";
+import type {RawBodyRequest}  from "@nestjs/common";
+import { StripeService } from "src/stripe/stripe.service";
+import { Stripe } from "node_modules/stripe/cjs/stripe.core";
 
 @Controller('purchases')
 export class PurchaseController {
-    constructor(private readonly _purchaseService: PurchaseService, private readonly _licenseService: LicenseService) {}
+    constructor(
+        private readonly _purchaseService: PurchaseService,
+        private readonly _licenseService: LicenseService,
+        private readonly _stripeService: StripeService,
+    ) {}
 
     @Post('free/:id')
     @HttpCode(HttpStatus.CREATED)
@@ -79,5 +86,30 @@ export class PurchaseController {
 
         await archive.finalize();
     }
+
+    @Post('paid/:id')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard)
+    async initiatePaidPurchase(@Param() params: IdDto, @Request() req) {
+        const currentUser: CurrentUserDto = { id: req.user.id, userRole: req.user.userRole };
+        return this._purchaseService.initiatePaidPurchase(params, currentUser);
+    }
+
+    @Post('stripe/webhook')
+    @HttpCode(HttpStatus.OK)
+    async handleStripeWebhook(
+        @Req() req: RawBodyRequest<Request>,
+        @Headers('stripe-signature') signature: string,
+    ) {
+        const event = this._stripeService.constructWebhookEvent(req.rawBody, signature);
+
+        if (event.type === 'checkout.session.completed') {
+            const session = event.data.object as Stripe.Checkout.Session;
+            await this._purchaseService.completePaidPurchase(session);
+        }
+
+        return { received: true };
+    }
+
 
 }

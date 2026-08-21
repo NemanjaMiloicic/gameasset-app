@@ -85,7 +85,7 @@ export class UserController {
                 account.charges_enabled &&
                 account.payouts_enabled,
         };
-}
+    }
 
 
 

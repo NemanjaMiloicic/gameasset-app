@@ -1,12 +1,13 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Stripe } from "node_modules/stripe/cjs/stripe.core";
 import { AssetService } from "src/asset/asset.service";
 import { CurrentUserDto } from "src/shared/dtos/current-user.dto";
 import { IdDto } from "src/shared/dtos/id.dto";
 import { PaginationDto } from "src/shared/dtos/pagination.dto";
-import { AssetEntity } from "src/shared/entities/asset.entity";
 import { PurchaseEntity } from "src/shared/entities/purchase.entity";
 import { UserEntity } from "src/shared/entities/user.entity";
+import { StripeService } from "src/stripe/stripe.service";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -15,6 +16,7 @@ export class PurchaseService {
         @InjectRepository(PurchaseEntity)
         private readonly _purchaseRepo: Repository<PurchaseEntity>,
         private readonly _assetService: AssetService,
+        private readonly _stripeService: StripeService,
     ) {}
 
     async createFreePurchase(idDto: IdDto, currentUserDto: CurrentUserDto): Promise<PurchaseEntity> {
@@ -42,6 +44,61 @@ export class PurchaseService {
         return await this._purchaseRepo.save(purchaseEntity);
     }
 
+    async initiatePaidPurchase(idDto: IdDto, currentUser: CurrentUserDto): Promise<{ checkoutUrl: string }> {
+        const asset = await this._assetService.findOne(idDto);
+
+        if (asset.author.id === currentUser.id)
+            throw new BadRequestException('You cannot purchase your own asset');
+
+        if (Number(asset.price) === 0)
+            throw new BadRequestException('This asset is free, use the free purchase flow');
+
+        if (!asset.author.stripeOnboardingComplete || !asset.author.stripeAccountId)
+            throw new BadRequestException('This author has not completed payment setup yet');
+
+        const existingPurchase = await this._purchaseRepo.findOne({
+            where: { buyer: { id: currentUser.id }, asset: { id: asset.id } },
+        });
+
+        if (existingPurchase)
+            throw new ConflictException('You already own this asset');
+
+
+        const session = await this._stripeService.createCheckoutSession(
+            asset.title,
+            Number(asset.price),
+            asset.id,
+            currentUser.id,
+            asset.author.stripeAccountId,
+        );
+
+        return { checkoutUrl: session.url };
+    }
+
+    async completePaidPurchase(session: Stripe.Checkout.Session): Promise<void> {
+        const assetId = session.metadata.assetId;
+        const buyerId = session.metadata.buyerId;
+
+        const existing = await this._purchaseRepo.findOne({
+            where: { buyer: { id: buyerId }, asset: { id: assetId } },
+        });
+
+        if (existing) return;
+
+        const asset = await this._assetService.findOne({ id: assetId });
+
+        const purchase = this._purchaseRepo.create({
+            buyer: { id: buyerId } as Partial<UserEntity>,
+            asset: asset,
+            pricePaid: Number(asset.price),
+            stripePaymentId: session.payment_intent as string,
+        });
+
+        await this._purchaseRepo.save(purchase);
+    }
+
+
+
     async findMyPurchases(currentUserDto: CurrentUserDto, paginationDto: PaginationDto): Promise<{ data: PurchaseEntity[]; total: number }> {
         const [data, total] = await this._purchaseRepo.findAndCount({
             where: { buyer: { id: currentUserDto.id } },
@@ -54,17 +111,7 @@ export class PurchaseService {
         return { data, total };
     }
 
-    // async getDownloadableAsset(idDto: IdDto, currentUser: CurrentUserDto): Promise<AssetEntity> {
-    //     const purchase = await this._purchaseRepo.findOne({
-    //         where: { id: idDto.id, buyer: { id: currentUser.id } },
-    //         relations: { asset: { files: true } },
-    //     });
 
-    //     if (!purchase) 
-    //         throw new NotFoundException('Purchase not found');
-
-    //     return purchase.asset;
-    // }
 
     async getDownloadablePurchase(idDto: IdDto, currentUser: CurrentUserDto): Promise<PurchaseEntity> {
 
@@ -78,4 +125,6 @@ export class PurchaseService {
 
         return purchase;
     }
+
+
 }
