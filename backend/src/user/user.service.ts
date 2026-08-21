@@ -44,4 +44,12 @@ export class UserService {
         return await this._userRepository.findOne({where: {email: dto.email}})
     }
 
+    async setStripeAccountId(userId: string, stripeAccountId: string): Promise<void> {
+        await this._userRepository.update(userId, { stripeAccountId });
+    }
+
+    async markOnboardingComplete(userId: string): Promise<void> {
+        await this._userRepository.update(userId, { stripeOnboardingComplete: true });
+    }
+
 }

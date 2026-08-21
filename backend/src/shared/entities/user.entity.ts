@@ -45,6 +45,12 @@ export class UserEntity {
     @Column({type: 'timestamp', nullable: true})
     forgotPasswordExpires?: Date;
 
+    @Column({ nullable: true })
+    stripeAccountId: string;
+
+    @Column({ default: false })
+    stripeOnboardingComplete: boolean;
+
     @CreateDateColumn()
     createdAt: Date;
 
