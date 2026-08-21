@@ -54,16 +54,28 @@ export class PurchaseService {
         return { data, total };
     }
 
-    async getDownloadableAsset(idDto: IdDto, currentUser: CurrentUserDto): Promise<AssetEntity> {
+    // async getDownloadableAsset(idDto: IdDto, currentUser: CurrentUserDto): Promise<AssetEntity> {
+    //     const purchase = await this._purchaseRepo.findOne({
+    //         where: { id: idDto.id, buyer: { id: currentUser.id } },
+    //         relations: { asset: { files: true } },
+    //     });
+
+    //     if (!purchase) 
+    //         throw new NotFoundException('Purchase not found');
+
+    //     return purchase.asset;
+    // }
+
+    async getDownloadablePurchase(idDto: IdDto, currentUser: CurrentUserDto): Promise<PurchaseEntity> {
+
         const purchase = await this._purchaseRepo.findOne({
             where: { id: idDto.id, buyer: { id: currentUser.id } },
-            relations: { asset: { files: true } },
+            relations: { asset: { files: true, author: true } },
         });
 
-        if (!purchase) {
+        if (!purchase) 
             throw new NotFoundException('Purchase not found');
-        }
 
-        return purchase.asset;
+        return purchase;
     }
 }

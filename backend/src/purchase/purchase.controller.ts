@@ -7,10 +7,13 @@ import { PaginationDto } from "src/shared/dtos/pagination.dto";
 import type { Response } from "express";
 import { ZipArchive } from "archiver";
 import axios from "axios";
+import { LicenseType } from "src/shared/enums/license-type.enum";
+import { LicenseDataDto } from "src/shared/dtos/license-data.dto";
+import { LicenseService } from "src/license/license.service";
 
 @Controller('purchases')
 export class PurchaseController {
-    constructor(private readonly _purchaseService: PurchaseService) {}
+    constructor(private readonly _purchaseService: PurchaseService, private readonly _licenseService: LicenseService) {}
 
     @Post('free/:id')
     @HttpCode(HttpStatus.CREATED)
@@ -39,7 +42,9 @@ export class PurchaseController {
     ) {
 
         const currentUser: CurrentUserDto = { id: req.user.id, userRole: req.user.userRole };
-        const asset = await this._purchaseService.getDownloadableAsset(params, currentUser);
+        const purchase = await this._purchaseService.getDownloadablePurchase(params, currentUser);
+        const asset = purchase.asset;   
+
         res.set({
             'Content-Type': 'application/zip',
             'Content-Disposition': `attachment; filename="${asset.title}.zip"`,
@@ -47,6 +52,7 @@ export class PurchaseController {
 
         const archive = new ZipArchive({zlib: {level: 9}});
         archive.pipe(res);
+
         for (const file of asset.files) {
             
             const response = await axios.get(file.fileUrl, {
@@ -56,6 +62,19 @@ export class PurchaseController {
             archive.append(response.data, {
                 name: file.fileName,
             });
+        }
+
+        if (asset.licenseType !== LicenseType.NOTHING) {
+            const licenseData: LicenseDataDto = {
+                assetTitle: asset.title,
+                assetId: asset.id,
+                authorUsername: asset.author.username,
+                authorId: asset.author.id,
+                purchasedAt: purchase.purchasedAt,
+                licenseType: asset.licenseType,
+            };
+            const licenseBuffer = await this._licenseService.generateLicense(licenseData);
+            archive.append(licenseBuffer, { name: `license_${licenseData.assetTitle}.pdf` });
         }
 
         await archive.finalize();

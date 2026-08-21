@@ -33,7 +33,7 @@ export class AssetController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(UserRole.AUTHOR, UserRole.ADMIN)
-    async findMyPurchases(@Query() query: PaginationDto, @Request() req) {
+    async findMyAssets(@Query() query: PaginationDto, @Request() req) {
         const currentUserDto: CurrentUserDto = {id: req.user.id, userRole: req.user.userRole};
         return this._assetService.findMyAssets(currentUserDto, query);
     }
