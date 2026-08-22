@@ -19,9 +19,9 @@ export class UserController {
 
     @Post('')
     @HttpCode(HttpStatus.CREATED)
-    public async createUser(@Body() body: CreateUserDto): Promise<string> {
+    public async createUser(@Body() body: CreateUserDto): Promise<{message: string}> {
         await this._userService.create(body);
-        return `User:${body.username} added sucessfully`;
+        return {message: `User:${body.username} added sucessfully`};
     }
     
     @Get(':id')

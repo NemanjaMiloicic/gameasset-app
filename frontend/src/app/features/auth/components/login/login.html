@@ -1,0 +1,23 @@
+<div class="max-w-md mx-auto mt-10">
+  <h1 class="text-2xl font-bold mb-6">Login</h1>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <div>
+      <label class="label">Email</label>
+      <input type="email" formControlName="email" class="input input-bordered w-full" />
+    </div>
+
+    <div>
+      <label class="label">Password</label>
+      <input type="password" formControlName="password" class="input input-bordered w-full" />
+    </div>
+
+    @if (errorMessage()) {
+      <p class="text-error">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">
+      Login
+    </button>
+  </form>
+</div>

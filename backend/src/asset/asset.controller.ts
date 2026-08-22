@@ -26,7 +26,7 @@ export class AssetController {
     @Get()
     @HttpCode(HttpStatus.OK)
     async findAll() {
-        return this._assetService.findAll();
+        return await this._assetService.findAll();
     }
 
     @Get('my')
@@ -35,13 +35,13 @@ export class AssetController {
     @Roles(UserRole.AUTHOR, UserRole.ADMIN)
     async findMyAssets(@Query() query: PaginationDto, @Request() req) {
         const currentUserDto: CurrentUserDto = {id: req.user.id, userRole: req.user.userRole};
-        return this._assetService.findMyAssets(currentUserDto, query);
+        return await this._assetService.findMyAssets(currentUserDto, query);
     }
 
     @Get(':id')
     @HttpCode(HttpStatus.OK)
     async findOne(@Param() params: IdDto) {
-        return this._assetService.findOne(params);
+        return await this._assetService.findOne(params);
     }
 
     @Post(':id/files')
@@ -53,7 +53,7 @@ export class AssetController {
         @Param() params: IdDto,
         @UploadedFiles() files: Array<Express.Multer.File>,
     ) {
-        return this._assetService.addFiles(params, files);
+        return await this._assetService.addFiles(params, files);
     }
 
     @Put(':id/preview')
@@ -65,7 +65,7 @@ export class AssetController {
         @Param() params: IdDto,
         @UploadedFile() file: Express.Multer.File,
     ) {
-        return this._assetService.updatePreviewImage(params, file);
+        return await this._assetService.updatePreviewImage(params, file);
     }
 
     @Put(':id')
@@ -78,7 +78,7 @@ export class AssetController {
         @Request() req
     ) {
         const currentUser: CurrentUserDto = { id: req.user.id, userRole: req.user.userRole };
-        return this._assetService.update(params, dto, currentUser);
+        return await this._assetService.update(params, dto, currentUser);
 
     }
 
@@ -92,7 +92,7 @@ export class AssetController {
     ) {
 
         const currentUser: CurrentUserDto = { id: req.user.id, userRole: req.user.userRole };
-        return this._assetService.remove(params, currentUser);
+        return await this._assetService.remove(params, currentUser);
 
     }
 }

@@ -28,7 +28,7 @@ export class PurchaseController {
     async createFreePurchase(@Param() params: IdDto, @Request() req) {
 
         const currentUser: CurrentUserDto = {id: req.user.id, userRole:req.user.userRole};
-        return this._purchaseService.createFreePurchase(params, currentUser);
+        return await this._purchaseService.createFreePurchase(params, currentUser);
     }
 
     @Get('my')
@@ -36,7 +36,7 @@ export class PurchaseController {
     @UseGuards(JwtAuthGuard)
     async findMyPurchases(@Query() query: PaginationDto, @Request() req) {
         const currentUserDto: CurrentUserDto = {id: req.user.id, userRole: req.user.userRole};
-        return this._purchaseService.findMyPurchases(currentUserDto, query);
+        return await this._purchaseService.findMyPurchases(currentUserDto, query);
     }
 
     @Get(':id/download')
@@ -92,7 +92,7 @@ export class PurchaseController {
     @UseGuards(JwtAuthGuard)
     async initiatePaidPurchase(@Param() params: IdDto, @Request() req) {
         const currentUser: CurrentUserDto = { id: req.user.id, userRole: req.user.userRole };
-        return this._purchaseService.initiatePaidPurchase(params, currentUser);
+        return await this._purchaseService.initiatePaidPurchase(params, currentUser);
     }
 
     @Post('stripe/webhook')

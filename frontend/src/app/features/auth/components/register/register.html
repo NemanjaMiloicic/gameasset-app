@@ -1,0 +1,37 @@
+<div class="max-w-md mx-auto mt-10">
+  <h1 class="text-2xl font-bold mb-6">Register</h1>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <div>
+      <label class="label">Email</label>
+      <input type="email" formControlName="email" class="input input-bordered w-full" />
+      @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+        <p class="text-error text-sm mt-1">Enter a valid email</p>
+      }
+    </div>
+
+    <div>
+      <label class="label">Username</label>
+      <input type="text" formControlName="username" class="input input-bordered w-full" />
+      @if (registerForm.get('username')?.invalid && registerForm.get('username')?.touched) {
+        <p class="text-error text-sm mt-1">Username must be at least 3 characters</p>
+      }
+    </div>
+
+    <div>
+      <label class="label">Password</label>
+      <input type="password" formControlName="password" class="input input-bordered w-full" />
+      @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+        <p class="text-error text-sm mt-1">Password must be at least 6 characters</p>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <p class="text-error">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">
+      Register
+    </button>
+  </form>
+</div>
