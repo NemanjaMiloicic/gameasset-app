@@ -35,7 +35,7 @@ export class Register {
     this._authService.register(payload).subscribe({
 
       next: () => {
-        this._router.navigate(['/login']);
+        this._router.navigate(['auth/login']);
       },
 
       error: (err) => {

@@ -1,0 +1,7 @@
+<div class="max-w-md mx-auto mt-10 text-center">
+  <h1 class="text-2xl font-bold mb-4">Email Verification</h1>
+  <p [class.text-error]="isError()" [class.text-success]="!isError()">
+    {{ statusMessage() }}
+  </p>
+  <a routerLink="/auth/login" class="btn btn-primary mt-6">Go to Login</a>
+</div>

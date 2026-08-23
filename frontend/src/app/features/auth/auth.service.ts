@@ -20,4 +20,10 @@ export class AuthService {
   login(payload: LoginPayload): Observable<AuthResponse> {
     return this._http.post<AuthResponse>(`${this._apiUrl}/auth/login`, payload);
   }
+
+  verifyEmail(token: string): Observable<{message: string}> {
+    return this._http.get<{message: string}>(`${this._apiUrl}/auth/verify`, {
+      params: {token},
+    });
+  }
 }
