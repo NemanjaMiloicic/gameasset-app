@@ -1,3 +1,6 @@
+import { AuthUser } from "./auth-user.interface";
+
 export interface AuthResponse {
-    accessToken: string,
+  accessToken: string;
+  user: AuthUser
 }

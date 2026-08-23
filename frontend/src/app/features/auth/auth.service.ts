@@ -5,6 +5,7 @@ import { RegisterPayload } from './interfaces/register-payload.interface';
 import { Observable } from 'rxjs';
 import { LoginPayload } from './interfaces/login-payload.interface';
 import { AuthResponse } from './interfaces/auth-response.interface';
+import { AuthUser } from './interfaces/auth-user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -25,5 +26,9 @@ export class AuthService {
     return this._http.get<{message: string}>(`${this._apiUrl}/auth/verify`, {
       params: {token},
     });
+  }
+
+  getProfile(): Observable<AuthUser> {
+    return this._http.get<AuthUser>(`${this._apiUrl}/auth/profile`);
   }
 }

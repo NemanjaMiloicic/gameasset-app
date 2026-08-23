@@ -1,10 +1,14 @@
 <div class="navbar bg-base-100 shadow-sm px-4">
   <div class="flex-1">
-    <a class="btn btn-ghost text-xl">GameAssets</a>
+    <a routerLink="/" class="btn btn-ghost text-xl">GameAsset</a>
   </div>
   <div class="flex-none gap-2">
-    <a class="btn btn-ghost">Browse</a>
-    <a class="btn btn-ghost">Login</a>
-    <a class="btn btn-primary">Register</a>
+    @if (isAuthenticated()) {
+      <span class="text-sm">Hi, {{ user()?.username }}</span>
+      <button class="btn btn-ghost" (click)="onLogout()">Logout</button>
+    } @else {
+      <a routerLink="/auth/login" class="btn btn-ghost">Login</a>
+      <a routerLink="/auth/register" class="btn btn-primary">Register</a>
+    }
   </div>
 </div>

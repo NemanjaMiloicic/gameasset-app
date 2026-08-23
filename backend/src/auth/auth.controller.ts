@@ -7,6 +7,7 @@ import { EmailDto } from "src/shared/dtos/email.dto";
 import { TokenDto } from "./dtos/token.dto";
 import { ResetPasswordDto } from "./dtos/resetPassword.dto";
 import { ForgotPasswordDto } from "./dtos/forgotPassword.dto";
+import { LoginResponse } from "src/shared/interfaces/login-response.interface";
 
 @Controller('auth')
 export class AuthController {
@@ -15,9 +16,17 @@ export class AuthController {
     @UseGuards(LocalAuthGuard)
     @Post('login')
     @HttpCode(HttpStatus.OK)
-    async login(@Request() req): Promise<{message: string}> {
-        const message = await this._authService.login(req.user);
-        return {message};
+    async login(@Request() req): Promise<LoginResponse> {
+          const accessToken = await this._authService.login(req.user);
+          return {
+            accessToken,
+            user: {
+                id: req.user.id,
+                email: req.user.email,
+                username: req.user.username,
+                userRole: req.user.userRole,
+            },
+        }; 
     }
 
     @UseGuards(JwtAuthGuard)

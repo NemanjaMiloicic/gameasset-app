@@ -1,11 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { RouterLink } from '@angular/router';
+import { selectIsAuthenticated, selectUser } from '../../../features/auth/store/auth.selectors';
+import * as AuthActions from '../../../features/auth/store/auth.actions';
 
 @Component({
   selector: 'app-navbar',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
+  private readonly _store = inject(Store);
 
+  isAuthenticated = this._store.selectSignal(selectIsAuthenticated);
+  user = this._store.selectSignal(selectUser);
+
+  onLogout(): void {
+    this._store.dispatch(AuthActions.logout());
+  }
 }

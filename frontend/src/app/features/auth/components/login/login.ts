@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../auth.service';
-import { Router } from '@angular/router';
-import { LoginPayload } from '../../interfaces/login-payload.interface';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import * as AuthActions from '../../store/auth.actions';
+import { selectError, selectIsLoading } from '../../store/auth.selectors';
 
 @Component({
   selector: 'app-login',
@@ -12,10 +12,10 @@ import { LoginPayload } from '../../interfaces/login-payload.interface';
 })
 export class Login {
   private readonly _formBuilder = inject(FormBuilder);
-  private readonly _authService = inject(AuthService);
-  private readonly _router = inject(Router);
+  private readonly _store = inject(Store);
 
-  errorMessage = signal('');
+  errorMessage = this._store.selectSignal(selectError);
+  isLoading = this._store.selectSignal(selectIsLoading);
 
   loginForm = this._formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
@@ -27,19 +27,9 @@ export class Login {
       return;
     }
 
-    const payload: LoginPayload = {
+    this._store.dispatch(AuthActions.login({
       email: this.loginForm.value.email!,
       password: this.loginForm.value.password!,
-    };
-
-    this._authService.login(payload).subscribe({
-      next: (response) => {
-        localStorage.setItem('accessToken', response.accessToken);
-        this._router.navigate(['/']);
-      },
-      error: (err) => {
-        this.errorMessage.set(err.error?.message ?? 'Login failed');
-      },
-    });
+    }));
   }
 }
