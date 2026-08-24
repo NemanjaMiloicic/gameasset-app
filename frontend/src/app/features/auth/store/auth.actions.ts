@@ -16,3 +16,4 @@ export const loginFailure = createAction(
 );
 
 export const logout = createAction('[Auth] Logout');
+export const sessionCleared = createAction('[Auth] Session Cleared');

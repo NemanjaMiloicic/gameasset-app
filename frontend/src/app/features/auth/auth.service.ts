@@ -6,6 +6,8 @@ import { Observable } from 'rxjs';
 import { LoginPayload } from './interfaces/login-payload.interface';
 import { AuthResponse } from './interfaces/auth-response.interface';
 import { AuthUser } from './interfaces/auth-user.interface';
+import { ForgotPasswordPayload } from './interfaces/forgot-password.interface';
+import { ResetPasswordPayload } from './interfaces/reset-password.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -30,5 +32,19 @@ export class AuthService {
 
   getProfile(): Observable<AuthUser> {
     return this._http.get<AuthUser>(`${this._apiUrl}/auth/profile`);
+  }
+
+  forgotPassword(payload: ForgotPasswordPayload): Observable<{ message: string }> {
+    return this._http.post<{ message: string }>(`${this._apiUrl}/auth/forgotPassword`, payload);
+  }
+
+  validatePasswordToken(token: string, email: string): Observable<boolean> {
+      return this._http.get<boolean>(`${this._apiUrl}/auth/validPasswordToken`, {
+          params: { token, email },
+      });
+  }
+
+  resetPassword(payload: ResetPasswordPayload): Observable<{ message: string }> {
+      return this._http.put<{ message: string }>(`${this._apiUrl}/auth/resetPassword`, payload);
   }
 }

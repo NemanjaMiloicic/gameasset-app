@@ -63,14 +63,14 @@ export class AuthEffects {
         const token = localStorage.getItem('accessToken');
 
         if (!token) {
-          return of(AuthActions.logout());
+          return of(AuthActions.sessionCleared());
         }
 
         return this._authService.getProfile().pipe(
           map((user) => AuthActions.loginSuccess({ user, token })),
           catchError(() => {
             localStorage.removeItem('accessToken');
-            return of(AuthActions.logout());
+            return of(AuthActions.sessionCleared());
           })
         );
       })
