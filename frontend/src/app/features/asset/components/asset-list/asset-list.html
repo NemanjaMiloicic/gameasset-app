@@ -1,0 +1,15 @@
+<div class="max-w-6xl mx-auto mt-8 px-4">
+  <h1 class="text-3xl font-bold mb-6">Browse Assets</h1>
+
+  @if (isLoading()) {
+    <p>Loading assets...</p>
+  } @else if (assets().length === 0) {
+    <p>No assets found.</p>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      @for (asset of assets(); track asset.id) {
+        <app-asset-card [asset]="asset" (cardClicked)="onAssetClick($event)" />
+      }
+    </div>
+  }
+</div>

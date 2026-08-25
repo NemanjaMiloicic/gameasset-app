@@ -1,0 +1,22 @@
+<div
+  class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow cursor-pointer"
+  (click)="onCardClick()"
+>
+  <figure class="h-40 bg-base-200">
+    @if (asset().previewImageUrl) {
+      <img [src]="asset().previewImageUrl" [alt]="asset().title" class="w-full h-full object-cover" />
+    } @else {
+      <div class="flex items-center justify-center h-full text-base-content/40">
+        No preview
+      </div>
+    }
+  </figure>
+  <div class="card-body p-4">
+    <h2 class="card-title text-base">{{ asset().title }}</h2>
+    <p class="text-sm text-base-content/70">{{ asset().assetType }}</p>
+    <p class="text-sm text-base-content/60">by {{ asset().author.username }}</p>
+    <p class="font-semibold mt-2">
+      {{ asset().price === '0.00' ? 'Free' : asset().price + ' €' }}
+    </p>
+  </div>
+</div>

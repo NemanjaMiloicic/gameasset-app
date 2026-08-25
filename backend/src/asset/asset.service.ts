@@ -42,11 +42,15 @@ export class AssetService {
         return await this._assetRepo.save(assetEntity);
     }
 
-    async findAll(): Promise<AssetEntity[]> {
-        return this._assetRepo.find({
-            relations: { author: true },
-            order: {createdAt: 'DESC'}
+  async findAll(paginationDto: PaginationDto): Promise<{ data: AssetEntity[]; total: number }> {
+        const [data, total] = await this._assetRepo.findAndCount({
+            relations: { author: true, files: true },
+            order: { createdAt: 'DESC' },
+            skip: paginationDto.skip,
+            take: paginationDto.limit,
         });
+
+        return { data, total };
     }
 
     async findOne(idDto: IdDto): Promise<AssetEntity> {

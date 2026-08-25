@@ -25,8 +25,8 @@ export class AssetController {
 
     @Get()
     @HttpCode(HttpStatus.OK)
-    async findAll() {
-        return await this._assetService.findAll();
+    async findAll(@Query() query: PaginationDto) {
+        return this._assetService.findAll(query);
     }
 
     @Get('my')
