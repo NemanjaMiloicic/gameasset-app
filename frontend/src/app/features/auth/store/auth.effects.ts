@@ -62,12 +62,11 @@ export class AuthEffects {
       switchMap(() => {
         const token = localStorage.getItem('accessToken');
 
-        if (!token) {
+        if (!token)
           return of(AuthActions.sessionCleared());
-        }
 
         return this._authService.getProfile().pipe(
-          map((user) => AuthActions.loginSuccess({ user, token })),
+          map((user) => AuthActions.sessionRestored({ user, token })),
           catchError(() => {
             localStorage.removeItem('accessToken');
             return of(AuthActions.sessionCleared());

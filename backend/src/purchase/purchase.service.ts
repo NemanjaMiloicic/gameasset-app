@@ -126,5 +126,16 @@ export class PurchaseService {
         return purchase;
     }
 
+    async checkOwnership(assetId: string, currentUser: CurrentUserDto): Promise<{ owned: boolean; purchaseId: string | null }> {
+        const purchase = await this._purchaseRepo.findOne({
+            where: { asset: { id: assetId }, buyer: { id: currentUser.id } },
+        });
+
+        return {
+            owned: !!purchase,
+            purchaseId: purchase?.id ?? null,
+        };
+    }
+
 
 }

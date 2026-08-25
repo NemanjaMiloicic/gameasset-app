@@ -11,7 +11,7 @@ export const authReducer = createReducer(
     error: null,
   })),
 
-  on(AuthActions.loginSuccess, (state, { user, token }): AuthState => ({
+  on(AuthActions.loginSuccess, AuthActions.sessionRestored, (state, { user, token }): AuthState => ({
     ...state,
     user,
     token,

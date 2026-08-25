@@ -111,5 +111,13 @@ export class PurchaseController {
         return { received: true };
     }
 
+   @Get('check/:id')
+   @HttpCode(HttpStatus.OK)
+   @UseGuards(JwtAuthGuard)
+   async checkOwnership(@Param() params: IdDto, @Request() req) {
+      const currentUser: CurrentUserDto = { id: req.user.id, userRole: req.user.userRole };
+      return await this._purchaseService.checkOwnership(params.id, currentUser);
+   }
+
 
 }

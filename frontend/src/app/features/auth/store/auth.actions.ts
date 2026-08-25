@@ -10,6 +10,11 @@ export const loginSuccess = createAction(
   props<{ user: { id: string; email: string; username: string; userRole: string }; token: string }>()
 );
 
+export const sessionRestored = createAction(
+  '[Auth] Session Restored',
+  props<{ user: { id: string; email: string; username: string; userRole: string }; token: string }>()
+);
+
 export const loginFailure = createAction(
   '[Auth] Login Failure',
   props<{ error: string }>()

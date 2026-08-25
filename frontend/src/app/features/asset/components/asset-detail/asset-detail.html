@@ -1,38 +1,55 @@
 <div class="max-w-4xl mx-auto mt-8 px-4">
-  <button class="btn btn-ghost btn-sm mb-4" (click)="goBack()">
-    ← Back to Assets
-  </button>
-  @if (asset(); as a) {
-    <div class="flex gap-6">
-      <img [src]="a.previewImageUrl" [alt]="a.title" class="w-64 h-64 object-cover rounded-lg" />
-      <div>
-        <h1 class="text-3xl font-bold">{{ a.title }}</h1>
-        <p class="text-base-content/70 mt-2">{{ a.description }}</p>
-        <p class="text-sm mt-2">by {{ a.author.username }}</p>
+  <button class="btn btn-ghost btn-sm mb-4" (click)="goBack()">← Back to Assets</button>
 
-        <div class="flex gap-2 mt-3">
-          <span class="badge badge-outline">{{ a.assetType }}</span>
-          <span class="badge badge-outline">{{ a.licenseType }}</span>
-        </div>
+  @if (assetWithOwnership(); as data) {
+    @if (data[0]; as a) {
+      <div class="flex gap-6">
+        <img [src]="a.previewImageUrl" [alt]="a.title" class="w-64 h-64 object-cover rounded-lg" />
+        <div>
+          <h1 class="text-3xl font-bold">{{ a.title }}</h1>
+          <p class="text-base-content/70 mt-2">{{ a.description }}</p>
+          <p class="text-sm mt-2">by {{ a.author.username }}</p>
 
-        @if (a.tags && a.tags.length > 0) {
-          <div class="flex gap-1 mt-2 flex-wrap">
-            @for (tag of a.tags; track tag) {
-              <span class="badge badge-ghost badge-sm">#{{ tag }}</span>
-            }
+          <div class="flex gap-2 mt-3">
+            <span class="badge badge-outline">{{ a.assetType }}</span>
+            <span class="badge badge-outline">{{ a.licenseType }}</span>
           </div>
-        }
 
-        <p class="text-2xl font-bold mt-4">
-          {{ a.price === '0.00' ? 'Free' : a.price + ' €' }}
-        </p>
+          @if (a.tags && a.tags.length > 0) {
+            <div class="flex gap-1 mt-2 flex-wrap">
+              @for (tag of a.tags; track tag) {
+                <span class="badge badge-ghost badge-sm">#{{ tag }}</span>
+              }
+            </div>
+          }
 
-        <div class="mt-4">
+          <p class="text-2xl font-bold mt-4">
+            {{ a.price === '0.00' ? 'Free' : a.price + ' €' }}
+          </p>
 
+          <div class="mt-4">
+          @if (actionError()) {
+            <p class="text-error text-sm mb-2">{{ actionError() }}</p>
+          }
+
+          @if (data[1].owned) {
+            <button class="btn btn-success" [disabled]="isProcessing()" (click)="onDownload(data[1].purchaseId!)">
+              Download
+            </button>
+          } @else if (a.price === '0.00') {
+            <button class="btn btn-primary" [disabled]="isProcessing()" (click)="onBuyFree(a.id)">
+              Get for Free
+            </button>
+          } @else {
+            <button class="btn btn-primary" [disabled]="isProcessing()" (click)="onBuyPaid(a.id)">
+              Buy Now
+            </button>
+          }
+        </div>
         </div>
       </div>
-    </div>
+    }
   } @else {
-    <p>Asset not found or still loading.</p>
+    <p>Loading...</p>
   }
 </div>
