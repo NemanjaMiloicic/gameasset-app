@@ -19,4 +19,9 @@ export const routes: Routes = [
         loadChildren: () => import('./features/purchase/purchase.routes').then(m => m.purchaseRoutes),
     },
 
+    {
+        path: 'author',
+        loadChildren: () => import('./features/author/author.routes').then(m => m.authorRoutes),
+    },
+
 ];

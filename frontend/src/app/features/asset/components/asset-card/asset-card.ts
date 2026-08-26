@@ -1,9 +1,10 @@
 import { Component, input, output } from '@angular/core';
 import { Asset } from '../../interfaces/asset.interface';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-asset-card',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './asset-card.html',
   styleUrl: './asset-card.css',
 })

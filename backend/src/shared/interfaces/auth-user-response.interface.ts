@@ -5,4 +5,5 @@ export interface AuthUserResponse {
     email: string;
     username: string;
     userRole: UserRole;
+    stripeOnboardingComplete: boolean;
 }

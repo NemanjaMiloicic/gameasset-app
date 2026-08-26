@@ -1,5 +1,5 @@
 import { Component, inject, effect, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, of, switchMap } from 'rxjs';
@@ -10,7 +10,7 @@ import { selectIsAuthenticated } from '../../../auth/store/auth.selectors';
 
 @Component({
   selector: 'app-asset-detail',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './asset-detail.html',
   styleUrl: './asset-detail.css',
 })

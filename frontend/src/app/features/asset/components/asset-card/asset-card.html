@@ -14,7 +14,14 @@
   <div class="card-body p-4">
     <h2 class="card-title text-base">{{ asset().title }}</h2>
     <p class="text-sm text-base-content/70">{{ asset().assetType }}</p>
-    <p class="text-sm text-base-content/60">by {{ asset().author.username }}</p>
+    <p class="text-sm text-base-content/60">
+      by
+      <a
+      [routerLink]="['/author', asset().author.id]"
+        class="link link-hover"
+        (click)="$event.stopPropagation()"
+      >{{ asset().author.username }}</a>
+    </p>
     <p class="font-semibold mt-2">
       {{ asset().price === '0.00' ? 'Free' : asset().price + ' €' }}
     </p>

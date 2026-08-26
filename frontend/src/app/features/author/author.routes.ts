@@ -1,0 +1,11 @@
+import { Routes } from '@angular/router';
+import { AuthorProfile } from './components/author-profile/author-profile';
+import { AuthorDashboard } from './components/author-dashboard/author-dashboard';
+import { authGuard } from '../../shared/guards/auth.guard';
+import { MyAssets } from './components/my-assets/my-assets';
+
+export const authorRoutes: Routes = [
+  { path: 'dashboard', component: AuthorDashboard, canActivate: [authGuard] },
+  { path: 'assets', component: MyAssets, canActivate: [authGuard] },
+  { path: ':id', component: AuthorProfile },
+];

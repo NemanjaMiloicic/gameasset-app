@@ -1,5 +1,7 @@
+import { AuthUser } from "../interfaces/auth-user.interface";
+
 export interface AuthState {
-  user: { id: string; email: string; username: string; userRole: string } | null;
+  user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
   isInitializing: boolean;

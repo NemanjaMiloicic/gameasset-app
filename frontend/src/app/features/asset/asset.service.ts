@@ -21,4 +21,10 @@ export class AssetService {
   getById(id: string): Observable<Asset> {
     return this._http.get<Asset>(`${this._apiUrl}/assets/${id}`);
   }
+
+  getMy(skip: number, limit: number): Observable<PaginatedResponse<Asset>> {
+    return this._http.get<PaginatedResponse<Asset>>(`${this._apiUrl}/assets/my`, {
+        params: { skip, limit },
+    });
+  }
 }

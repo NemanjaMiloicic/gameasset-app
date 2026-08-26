@@ -25,6 +25,7 @@ export class AuthController {
                 email: req.user.email,
                 username: req.user.username,
                 userRole: req.user.userRole,
+                stripeOnboardingComplete: req.user.stripeOnboardingComplete,
             },
         }; 
     }

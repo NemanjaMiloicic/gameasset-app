@@ -3,4 +3,5 @@ export interface AuthUser {
   email: string;
   username: string;
   userRole: string;
+  stripeOnboardingComplete: boolean;
 }

@@ -1,0 +1,30 @@
+<div class="max-w-4xl mx-auto mt-8 px-4">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">My Assets</h1>
+    <a routerLink="/author/assets/new" class="btn btn-primary">+ Upload New Asset</a>
+  </div>
+
+  @if (isLoading()) {
+    <p>Loading...</p>
+  } @else if (assets().length === 0) {
+    <p>You haven't uploaded any assets yet.</p>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      @for (asset of assets(); track asset.id) {
+        <div class="card bg-base-100 shadow-md">
+          @if (asset.previewImageUrl) {
+            <figure class="h-32">
+              <img [src]="asset.previewImageUrl" [alt]="asset.title" class="w-full h-full object-cover" />
+            </figure>
+          }
+          <div class="card-body p-4">
+            <h2 class="card-title text-base">{{ asset.title }}</h2>
+            <p class="text-sm text-base-content/70">
+              {{ asset.price === '0.00' ? 'Free' : asset.price + ' €' }}
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

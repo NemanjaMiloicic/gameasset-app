@@ -6,6 +6,7 @@ import { CreateUserDto } from "./dtos/create-user.dto";
 import * as bcrypt from 'bcrypt';
 import { IdDto } from "src/shared/dtos/id.dto";
 import { EmailDto } from "src/shared/dtos/email.dto";
+import { UserRole } from "src/shared/enums/user-role.enum";
 
 @Injectable()
 export class UserService {
@@ -50,6 +51,10 @@ export class UserService {
 
     async markOnboardingComplete(userId: string): Promise<void> {
         await this._userRepository.update(userId, { stripeOnboardingComplete: true });
+    }
+
+    async promoteToAuthor(userId: string): Promise<void> {
+        await this._userRepository.update(userId, { userRole: UserRole.AUTHOR });
     }
 
 }

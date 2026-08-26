@@ -1,0 +1,28 @@
+<div class="max-w-2xl mx-auto mt-10 px-4">
+  @if (user(); as u) {
+    @if (u.userRole === 'user') {
+      <h1 class="text-2xl font-bold mb-4">Become an Author</h1>
+      <p class="text-base-content/70 mb-6">
+        Start selling your game assets. You'll need to connect a Stripe account to receive payments.
+      </p>
+      <button class="btn btn-primary" [disabled]="isRedirecting" (click)="onBecomeAuthor()">
+        Become an Author
+      </button>
+    } @else if (u.userRole === 'author' || u.userRole === 'admin') {
+      <h1 class="text-2xl font-bold mb-6">Author Dashboard</h1>
+
+      @if (!u.stripeOnboardingComplete) {
+        <div class="alert alert-warning mb-4">
+          Finish your payment setup to start selling assets.
+          <button class="btn btn-sm btn-primary" (click)="onBecomeAuthor()">Complete Setup</button>
+        </div>
+      }
+
+      <div class="flex flex-col gap-3">
+        <a routerLink="/author/profile/edit" class="btn btn-outline">Update Profile</a>
+        <a routerLink="/author/assets" class="btn btn-outline">My Assets</a>
+        <a routerLink="/author/assets/new" class="btn btn-primary">Upload New Asset</a>
+      </div>
+    }
+  }
+</div>

@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store';
+import { AuthUser } from '../interfaces/auth-user.interface';
 
 export const login = createAction(
     '[Auth] Login',
@@ -7,12 +8,12 @@ export const login = createAction(
 
 export const loginSuccess = createAction(
   '[Auth] Login Success',
-  props<{ user: { id: string; email: string; username: string; userRole: string }; token: string }>()
+  props<{ user: AuthUser; token: string }>()
 );
 
 export const sessionRestored = createAction(
   '[Auth] Session Restored',
-  props<{ user: { id: string; email: string; username: string; userRole: string }; token: string }>()
+  props<{ user: AuthUser; token: string }>()
 );
 
 export const loginFailure = createAction(

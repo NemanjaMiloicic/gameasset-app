@@ -68,34 +68,25 @@ export class UserController {
     @Get('stripe/onboarding-complete')
     @HttpCode(HttpStatus.OK)
     @UseGuards(JwtAuthGuard)
-    @Roles(UserRole.AUTHOR, UserRole.ADMIN)
     async stripeOnboardingComplete(@Request() req) {
-
-        const user = await this._userService.findById({
-            id: req.user.id,
-        });
+        
+        const user = await this._userService.findById({ id: req.user.id });
 
         if (!user.stripeAccountId)
             throw new BadRequestException('Stripe account not found');
 
-        const account = await this._stripeService.retrieveAccount(
-            user.stripeAccountId,
-        );
+        const account = await this._stripeService.retrieveAccount(user.stripeAccountId);
+        const isComplete = account.details_submitted && account.charges_enabled && account.payouts_enabled;
 
-        if (
-            account.details_submitted &&
-            account.charges_enabled &&
-            account.payouts_enabled
-        ) {
+        if (isComplete) {
             await this._userService.markOnboardingComplete(user.id);
+
+            if (user.userRole === UserRole.USER) {
+                await this._userService.promoteToAuthor(user.id);
+            }
         }
 
-        return {
-            onboardingComplete:
-                account.details_submitted &&
-                account.charges_enabled &&
-                account.payouts_enabled,
-        };
+        return { onboardingComplete: isComplete };
     }
 
 
