@@ -27,3 +27,8 @@ export const selectError = createSelector(
   selectAuthState,
   (state) => state.error
 );
+
+export const selectIsInitializing = createSelector(
+  selectAuthState,
+  (state) => state.isInitializing
+);

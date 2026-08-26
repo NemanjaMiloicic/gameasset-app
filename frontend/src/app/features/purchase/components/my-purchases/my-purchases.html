@@ -1,0 +1,30 @@
+<div class="max-w-4xl mx-auto mt-8 px-4">
+  <h1 class="text-3xl font-bold mb-6">My Purchases</h1>
+
+  @if (isLoading()) {
+    <p>Loading...</p>
+  } @else if (purchases().length === 0) {
+    <p>You haven't purchased anything yet.</p>
+  } @else {
+    <div class="flex flex-col gap-3">
+      @for (purchase of purchases(); track purchase.id) {
+        <div class="card bg-base-100 shadow-md p-4 flex-row items-center justify-between">
+          <div class="flex items-center gap-4">
+            @if (purchase.asset.previewImageUrl) {
+              <img [src]="purchase.asset.previewImageUrl" class="w-16 h-16 object-cover rounded" />
+            }
+            <div>
+              <h2 class="font-bold">{{ purchase.asset.title }}</h2>
+              <p class="text-sm text-base-content/60">
+                {{ purchase.pricePaid === '0.00' ? 'Free' : purchase.pricePaid + ' €' }}
+              </p>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" (click)="onDownload(purchase.id)">
+            Download
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
