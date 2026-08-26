@@ -1,0 +1,91 @@
+<div class="max-w-2xl mx-auto mt-8 px-4">
+  <h1 class="text-3xl font-bold mb-6">Upload New Asset</h1>
+
+  @if (errorMessage()) {
+    <p class="text-error mb-4">{{ errorMessage() }}</p>
+  }
+
+  @if (!createdAsset()) {
+    <form [formGroup]="assetForm" (ngSubmit)="onSubmitMeta()" class="flex flex-col gap-4">
+      <div>
+        <label class="label">Title</label>
+        <input type="text" formControlName="title" class="input input-bordered w-full" />
+      </div>
+
+      <div>
+        <label class="label">Description</label>
+        <textarea formControlName="description" class="textarea textarea-bordered w-full"></textarea>
+      </div>
+
+      <div>
+        <label class="label">Asset Type</label>
+        <select formControlName="assetType" class="select select-bordered w-full">
+          <option value="tileset">Tileset</option>
+          <option value="sound_effect">Sound Effect</option>
+          <option value="model_3d">3D Model</option>
+          <option value="music">Music</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="label">Price (€, 0 for free)</label>
+        <input type="number" formControlName="price" min="0" step="0.01" class="input input-bordered w-full" />
+      </div>
+
+      <div>
+        <label class="label">License Type</label>
+        <select formControlName="licenseType" class="select select-bordered w-full">
+          <option value="nothing">Nothing required</option>
+          <option value="credit">Credit required</option>
+          <option value="license">License required</option>
+          <option value="license_and_credit">License and credit required</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="label">Tags</label>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            [(ngModel)]="tagInput"
+            [ngModelOptions]="{standalone: true}"
+            (keydown.enter)="$event.preventDefault(); addTag()"
+            class="input input-bordered flex-1"
+            placeholder="Type a tag and press Enter"
+          />
+          <button type="button" class="btn btn-outline" (click)="addTag()">Add</button>
+        </div>
+        <div class="flex gap-2 flex-wrap mt-2">
+          @for (tag of tags(); track tag) {
+            <span class="badge badge-primary gap-1">
+              {{ tag }}
+              <button type="button" (click)="removeTag(tag)">✕</button>
+            </span>
+          }
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="assetForm.invalid || isSubmitting()">
+        Create Asset
+      </button>
+    </form>
+  } @else {
+    <div class="flex flex-col gap-4">
+      <p class="text-success">Asset metadata saved! Now add files.</p>
+
+      <div>
+        <label class="label">Preview Image</label>
+        <input type="file" accept="image/*" (change)="onPreviewSelected($event)" class="file-input file-input-bordered w-full" />
+      </div>
+
+      <div>
+        <label class="label">Asset Files</label>
+        <input type="file" multiple (change)="onFilesSelected($event)" class="file-input file-input-bordered w-full" />
+      </div>
+
+      <button class="btn btn-primary" [disabled]="isUploadingFiles()" (click)="onFinishUpload()">
+        Finish
+      </button>
+    </div>
+  }
+</div>
