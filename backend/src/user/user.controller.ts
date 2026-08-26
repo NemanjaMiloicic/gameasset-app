@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, Request, BadRequestException } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, Request, BadRequestException, NotFoundException } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { IdDto } from "src/shared/dtos/id.dto";
@@ -9,6 +9,7 @@ import { RolesGuard } from "src/shared/guards/roles.guard";
 import { UserRole } from "src/shared/enums/user-role.enum";
 import { Roles } from "src/shared/decorators/roles.decorator";
 import { StripeService } from "src/stripe/stripe.service";
+import { PublicAuthorProfile } from "src/shared/interfaces/public-author-profile.interface";
 
 @Controller('users')
 export class UserController {
@@ -26,8 +27,18 @@ export class UserController {
     
     @Get(':id')
     @HttpCode(HttpStatus.OK)
-    public async findById(@Param() param: IdDto): Promise<UserEntity> {
-        return await this._userService.findById(param);
+    public async findById(@Param() param: IdDto): Promise<PublicAuthorProfile> {
+         const user = await this._userService.findById(param);
+
+        if (!user)
+            throw new NotFoundException('User not found');
+
+        return {
+            id: user.id,
+            username: user.username,
+            bio: user.bio,
+            avatarUrl: user.avatarUrl,
+        };
     }
 
     @Get()
