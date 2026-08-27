@@ -1,0 +1,8 @@
+<div class="max-w-2xl mx-auto mt-10 px-4 text-center">
+  @if (errorMessage()) {
+    <p class="text-error">{{ errorMessage() }}</p>
+  } @else {
+    <span class="loading loading-spinner loading-lg"></span>
+    <p class="mt-4">Confirming your setup...</p>
+  }
+</div>

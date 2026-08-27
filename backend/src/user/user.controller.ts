@@ -49,8 +49,7 @@ export class UserController {
 
     @Post('stripe/connect')
     @HttpCode(HttpStatus.OK)
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(UserRole.AUTHOR, UserRole.ADMIN)
+    @UseGuards(JwtAuthGuard)
     async connectStripe(@Request() req) {
         const user = await this._userService.findById({ id: req.user.id });
 

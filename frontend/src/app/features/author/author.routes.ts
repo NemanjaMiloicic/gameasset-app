@@ -4,10 +4,12 @@ import { AuthorDashboard } from './components/author-dashboard/author-dashboard'
 import { authGuard } from '../../shared/guards/auth.guard';
 import { MyAssets } from './components/my-assets/my-assets';
 import { UploadAsset } from './components/upload-asset/upload-asset';
+import { StripeOnboardingCallback } from './components/stripe-onboarding-callback/stripe-onboarding-callback';
 
 export const authorRoutes: Routes = [
   { path: 'dashboard', component: AuthorDashboard, canActivate: [authGuard] },
   { path: 'assets', component: MyAssets, canActivate: [authGuard] },
   { path: ':id', component: AuthorProfile },
   { path: 'assets/new', component: UploadAsset, canActivate: [authGuard] },
+  { path: 'stripe/callback' , component: StripeOnboardingCallback, canActivate: [authGuard]},
 ];

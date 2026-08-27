@@ -18,4 +18,8 @@ export class AuthorService {
   connectStripe(): Observable<{ onboardingUrl: string }> {
     return this._http.post<{ onboardingUrl: string }>(`${this._apiUrl}/users/stripe/connect`, {});
   }
+
+  checkOnboardingComplete(): Observable<{ onboardingComplete: boolean }> {
+    return this._http.get<{ onboardingComplete: boolean }>(`${this._apiUrl}/users/stripe/onboarding-complete`);
+  }
 }
