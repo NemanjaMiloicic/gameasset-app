@@ -7,12 +7,15 @@ import * as bcrypt from 'bcrypt';
 import { IdDto } from "src/shared/dtos/id.dto";
 import { EmailDto } from "src/shared/dtos/email.dto";
 import { UserRole } from "src/shared/enums/user-role.enum";
+import { UpdateProfileDto } from "./dtos/update-author.dto";
+import { SupabaseService } from "src/supabase/supabase.service";
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(UserEntity)
         private readonly _userRepository: Repository<UserEntity>,
+        private readonly _supabaseService: SupabaseService,
     ) {}
 
     async create(dto: CreateUserDto): Promise<UserEntity> {
@@ -57,4 +60,29 @@ export class UserService {
         await this._userRepository.update(userId, { userRole: UserRole.AUTHOR });
     }
 
+    async updateProfile(userId: string, dto: UpdateProfileDto): Promise<void> {
+        await this._userRepository.update(userId, dto);
+    }
+
+    async updateAvatar(userId: string, file: Express.Multer.File): Promise<string> {
+        const user = await this.findById({ id: userId });
+
+        if (!user)
+            throw new NotFoundException('User not found');
+
+        if (user.avatarUrl)
+            await this._supabaseService.deleteFileByUrl(user.avatarUrl);
+
+        const path = `avatars/${userId}/${Date.now()}-${file.originalname}`;
+        const avatarUrl = await this._supabaseService.uploadFile(
+            path,
+            file.buffer,
+            file.mimetype,
+        );
+
+        await this._userRepository.update(userId, { avatarUrl });
+        return avatarUrl;
+    }
+
+    
 }

@@ -1,0 +1,27 @@
+<div class="max-w-2xl mx-auto mt-10 px-4">
+  <h1 class="text-2xl font-bold mb-6">Update Profile</h1>
+
+  @if (errorMessage()) {
+    <p class="text-error mb-4">{{ errorMessage() }}</p>
+  }
+
+  @if (currentAvatarUrl()) {
+    <img [src]="currentAvatarUrl()" class="w-24 h-24 rounded-full object-cover mb-4" />
+  }
+
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <div>
+      <label class="label">Avatar</label>
+      <input type="file" accept="image/*" (change)="onAvatarSelected($event)" class="file-input file-input-bordered w-full" />
+    </div>
+
+    <div>
+      <label class="label">Bio</label>
+      <textarea formControlName="bio" rows="5" class="textarea textarea-bordered w-full"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || isSubmitting()">
+      Save
+    </button>
+  </form>
+</div>

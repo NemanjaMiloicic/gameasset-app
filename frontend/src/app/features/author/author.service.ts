@@ -22,4 +22,14 @@ export class AuthorService {
   checkOnboardingComplete(): Observable<{ onboardingComplete: boolean }> {
     return this._http.get<{ onboardingComplete: boolean }>(`${this._apiUrl}/users/stripe/onboarding-complete`);
   }
+
+  uploadAvatar(file: File): Observable<{ avatarUrl: string }> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return this._http.put<{ avatarUrl: string }>(`${this._apiUrl}/users/me/avatar`, formData);
+  }
+
+ updateProfile(payload: { bio?: string }): Observable<PublicAuthorProfile> {
+    return this._http.put<PublicAuthorProfile>(`${this._apiUrl}/users/me`, payload);
+  }
 }

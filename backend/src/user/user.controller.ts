@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, Request, BadRequestException, NotFoundException } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, Request, BadRequestException, NotFoundException, Put, UseInterceptors, UploadedFile } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { IdDto } from "src/shared/dtos/id.dto";
@@ -10,6 +10,8 @@ import { UserRole } from "src/shared/enums/user-role.enum";
 import { Roles } from "src/shared/decorators/roles.decorator";
 import { StripeService } from "src/stripe/stripe.service";
 import { PublicAuthorProfile } from "src/shared/interfaces/public-author-profile.interface";
+import { UpdateProfileDto } from "./dtos/update-author.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller('users')
 export class UserController {
@@ -86,6 +88,36 @@ export class UserController {
         }
 
         return { onboardingComplete: isComplete };
+    }
+
+    @Put('me')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard)
+    async updateProfile(@Request() req, @Body() body: UpdateProfileDto): Promise<PublicAuthorProfile> {
+        
+        await this._userService.updateProfile(req.user.id, body);
+        const user = await this._userService.findById({ id: req.user.id });
+
+        return {
+            id: user.id,
+            username: user.username,
+            bio: user.bio,
+            avatarUrl: user.avatarUrl,
+        };
+    }
+
+    @Put('me/avatar')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor('avatar'))
+    async updateAvatar(
+        @Request() req,
+        @UploadedFile() file: Express.Multer.File,
+    ): Promise<{ avatarUrl: string }> {
+
+        const avatarUrl = await this._userService.updateAvatar(req.user.id, file);
+        return { avatarUrl };
+        
     }
 
 
