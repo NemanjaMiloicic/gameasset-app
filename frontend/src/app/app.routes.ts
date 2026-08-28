@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Home } from './features/home/home';
+import { NotFound } from './shared/components/not-found/not-found';
 
 export const routes: Routes = [
     { path: '', component: Home},
@@ -23,5 +24,7 @@ export const routes: Routes = [
         path: 'author',
         loadChildren: () => import('./features/author/author.routes').then(m => m.authorRoutes),
     },
+    
+    { path: '**', component: NotFound },
 
 ];

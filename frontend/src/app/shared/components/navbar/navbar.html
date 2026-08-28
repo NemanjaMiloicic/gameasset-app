@@ -1,8 +1,19 @@
 <div class="navbar bg-base-100 shadow-sm px-4">
-  <div class="flex-1">
+  <div class="navbar-start">
     <a routerLink="/" class="btn btn-ghost text-xl">GameAssets</a>
   </div>
-  <div class="flex-none gap-2">
+
+  <div class="navbar-center hidden md:flex gap-2">
+    <a routerLink="/assets" class="btn btn-ghost">Assets</a>
+
+    @if (isAuthenticated() && (user()?.userRole === 'author' || user()?.userRole === 'admin')) {
+      <a routerLink="/author/dashboard" class="btn btn-ghost">Author Dashboard</a>
+    } @else {
+      <button class="btn btn-ghost" (click)="onAuthorClick()">Become an Author</button>
+    }
+  </div>
+
+  <div class="navbar-end gap-2">
     @if (isAuthenticated()) {
       <span class="text-sm">Hi, {{ user()?.username }}</span>
       <button class="btn btn-ghost" (click)="onLogout()">Logout</button>
