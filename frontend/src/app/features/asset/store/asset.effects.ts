@@ -12,18 +12,11 @@ export class AssetEffects {
   loadAssets$ = createEffect(() =>
     this._actions$.pipe(
       ofType(AssetActions.loadAssets),
-      switchMap(({ skip, limit }) =>
-        this._assetsService.getAll(skip, limit).pipe(
-          map((response) =>
-            AssetActions.loadAssetsSuccess({
-              assets: response.data,
-              total: response.total,
-            })
-          ),
+      switchMap(({ filters }) =>
+        this._assetsService.findAll(filters).pipe(
+          map(({ data, total }) => AssetActions.loadAssetsSuccess({ assets: data, total })),
           catchError((err) =>
-            of(AssetActions.loadAssetsFailure({
-              error: err.error?.message ?? 'Failed to load assets',
-            }))
+            of(AssetActions.loadAssetsFailure({ error: err.error?.message ?? 'Failed to load assets' }))
           )
         )
       )

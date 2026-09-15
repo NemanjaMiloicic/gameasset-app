@@ -1,10 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Asset } from './interfaces/asset.interface';
 import { PaginatedResponse } from '../../shared/interfaces/paginated-response.interface';
 import { CreateAssetPayload } from './interfaces/create-asset-payload.interface';
+import { AssetFilters } from './interfaces/asset-filters.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -46,4 +47,17 @@ export class AssetService {
       });
       return this._http.post<Asset>(`${this._apiUrl}/assets/${assetId}/files`, formData);
   }
+
+  findAll(filters: AssetFilters): Observable<{ data: Asset[]; total: number }> {
+    let params = new HttpParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+            params = params.set(key, value.toString());
+        }
+    });
+
+    return this._http.get<{ data: Asset[]; total: number }>(`${this._apiUrl}/assets`, { params });
+  }
+
 }

@@ -1,9 +1,10 @@
 import { createAction, props } from '@ngrx/store';
 import { Asset } from '../interfaces/asset.interface';
+import { AssetFilters } from '../interfaces/asset-filters.interface';
 
 export const loadAssets = createAction(
   '[Asset] Load Assets',
-  props<{ skip: number; limit: number }>()
+  props<{ filters: AssetFilters }>()
 );
 
 export const loadAssetsSuccess = createAction(
@@ -30,3 +31,4 @@ export const loadAssetByIdFailure = createAction(
   '[Asset] Load Asset By Id Failure',
   props<{ error: string }>()
 );
+

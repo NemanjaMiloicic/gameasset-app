@@ -28,3 +28,4 @@ export const selectAssetsTotal = createSelector(
 
 export const selectAssetById = (id: string) =>
   createSelector(selectAssetEntities, (entities) => entities[id]);
+

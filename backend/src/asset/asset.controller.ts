@@ -10,6 +10,7 @@ import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { UpdateAssetDto } from "./dtos/update-asset.dto";
 import { CurrentUserDto } from "../shared/dtos/current-user.dto";
 import { PaginationDto } from "src/shared/dtos/pagination.dto";
+import { SearchAssetsDto } from "./dtos/search-assets.dto";
 
 @Controller('assets')
 export class AssetController {
@@ -25,7 +26,7 @@ export class AssetController {
 
     @Get()
     @HttpCode(HttpStatus.OK)
-    async findAll(@Query() query: PaginationDto) {
+    async findAll(@Query() query: SearchAssetsDto) {
         return this._assetService.findAll(query);
     }
 

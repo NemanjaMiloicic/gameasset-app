@@ -1,6 +1,30 @@
 <div class="max-w-6xl mx-auto mt-8 px-4">
   <h1 class="text-3xl font-bold mb-6">Browse Assets</h1>
 
+  <form [formGroup]="filterForm" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 p-4 bg-base-200 rounded-lg">
+    <input type="text" formControlName="search" placeholder="Search by title..." class="input input-bordered w-full md:col-span-2" />
+
+    <select formControlName="assetType" class="select select-bordered w-full">
+      <option value="">All types</option>
+      <option value="tileset">Tileset</option>
+      <option value="sound_effect">Sound Effect</option>
+      <option value="model_3d">3D Model</option>
+      <option value="music">Music</option>
+    </select>
+
+    <input type="text" formControlName="tags" placeholder="Tags (comma separated)" class="input input-bordered w-full" />
+
+    <input type="number" formControlName="minPrice" placeholder="Min €" min="0" class="input input-bordered w-full" />
+    <input type="number" formControlName="maxPrice" placeholder="Max €" min="0" class="input input-bordered w-full" />
+
+    <label class="label cursor-pointer gap-2">
+      <input type="checkbox" formControlName="isFree" class="checkbox" />
+      <span class="label-text">Free only</span>
+    </label>
+
+    <button type="button" class="btn btn-ghost" (click)="onClearFilters()">Clear filters</button>
+  </form>
+
   @if (isLoading()) {
     <p>Loading assets...</p>
   } @else if (assets().length === 0) {
@@ -11,5 +35,31 @@
         <app-asset-card [asset]="asset" (cardClicked)="onAssetClick($event)" />
       }
     </div>
+
+    @if (totalPages() > 1) {
+      <div class="flex justify-center items-center gap-2 mt-8">
+        <button class="btn btn-sm" [disabled]="currentPage() === 0" (click)="onPageChange(currentPage() - 1)">
+          «
+        </button>
+
+        @for (page of [].constructor(totalPages()); track $index) {
+          <button
+            class="btn btn-sm"
+            [class.btn-primary]="$index === currentPage()"
+            (click)="onPageChange($index)"
+          >
+            {{ $index + 1 }}
+          </button>
+        }
+
+        <button class="btn btn-sm" [disabled]="currentPage() >= totalPages() - 1" (click)="onPageChange(currentPage() + 1)">
+          »
+        </button>
+      </div>
+
+      <p class="text-center text-sm text-base-content/60 mt-2">
+        {{ total() }} assets found
+      </p>
+    }
   }
 </div>

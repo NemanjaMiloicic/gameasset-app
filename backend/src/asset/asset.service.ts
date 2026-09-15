@@ -12,6 +12,7 @@ import { UpdateAssetDto } from "./dtos/update-asset.dto";
 import { CurrentUserDto } from "../shared/dtos/current-user.dto";
 import { UserRole } from "src/shared/enums/user-role.enum";
 import { PaginationDto } from "src/shared/dtos/pagination.dto";
+import { SearchAssetsDto } from "./dtos/search-assets.dto";
 
 @Injectable()
 export class AssetService {
@@ -42,14 +43,51 @@ export class AssetService {
         return await this._assetRepo.save(assetEntity);
     }
 
-  async findAll(paginationDto: PaginationDto): Promise<{ data: AssetEntity[]; total: number }> {
-        const [data, total] = await this._assetRepo.findAndCount({
-            relations: { author: true, files: true },
-            order: { createdAt: 'DESC' },
-            skip: paginationDto.skip,
-            take: paginationDto.limit,
-        });
+    async findAll(dto: SearchAssetsDto): Promise<{ data: AssetEntity[]; total: number }> {
+        const query = this._assetRepo.createQueryBuilder('asset')
+            .leftJoinAndSelect('asset.author', 'author')
+            .leftJoinAndSelect('asset.files', 'files')
+            .orderBy('asset.createdAt', 'DESC')
+            .skip(dto.skip)
+            .take(dto.limit);
 
+        if (dto.search) {
+            query.andWhere('asset.title ILIKE :search', { search: `%${dto.search}%` });
+        }
+
+        if (dto.assetType) {
+            query.andWhere('asset.assetType = :assetType', { assetType: dto.assetType });
+        }
+
+        if (dto.isFree === 'true') {
+            query.andWhere('asset.price = 0');
+        } else {
+            if (dto.minPrice !== undefined) {
+                query.andWhere('asset.price >= :minPrice', { minPrice: dto.minPrice });
+            }
+            if (dto.maxPrice !== undefined) {
+                query.andWhere('asset.price <= :maxPrice', { maxPrice: dto.maxPrice });
+            }
+        }
+
+        if (dto.tags) {
+            const tagList = dto.tags.split(',').map((t) => t.trim()).filter((t) => t);
+
+            if (tagList.length > 0) {
+                const tagConditions = tagList
+                    .map((_, index) => `asset.tags ILIKE :tag${index}`)
+                    .join(' OR ');
+
+                const tagParams = tagList.reduce((acc, tag, index) => {
+                    acc[`tag${index}`] = `%${tag}%`;
+                    return acc;
+                }, {} as Record<string, string>);
+
+                query.andWhere(`(${tagConditions})`, tagParams);
+            }
+        }
+
+        const [data, total] = await query.getManyAndCount();
         return { data, total };
     }
 
