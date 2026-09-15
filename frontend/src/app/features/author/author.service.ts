@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PublicAuthorProfile } from './interfaces/public-author-profile.interface';
+import { AuthorAnalytics } from './interfaces/author-analytics.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -31,5 +32,9 @@ export class AuthorService {
 
  updateProfile(payload: { bio?: string }): Observable<PublicAuthorProfile> {
     return this._http.put<PublicAuthorProfile>(`${this._apiUrl}/users/me`, payload);
+  }
+
+  getAnalytics(): Observable<AuthorAnalytics> {
+    return this._http.get<AuthorAnalytics>(`${this._apiUrl}/purchases/analytics/me`);
   }
 }

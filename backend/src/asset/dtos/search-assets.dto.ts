@@ -1,6 +1,6 @@
-import { IsOptional, IsString, IsNumber, IsBooleanString, Min } from "class-validator";
-import { Type } from "class-transformer";
-import { PaginationDto } from "src/shared/dtos/pagination.dto";
+import { IsOptional, IsString, IsNumber, IsBoolean, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { PaginationDto } from 'src/shared/dtos/pagination.dto';
 
 export class SearchAssetsDto extends PaginationDto {
     @IsOptional()
@@ -24,8 +24,9 @@ export class SearchAssetsDto extends PaginationDto {
     maxPrice?: number;
 
     @IsOptional()
-    @IsBooleanString()
-    isFree?: string;
+    @Transform(({ value }) => value === 'true' || value === true)
+    @IsBoolean()
+    isFree?: boolean;
 
     @IsOptional()
     @IsString()

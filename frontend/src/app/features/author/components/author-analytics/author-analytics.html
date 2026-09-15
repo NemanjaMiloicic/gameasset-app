@@ -1,0 +1,36 @@
+<div class="max-w-4xl mx-auto mt-10 px-4">
+  <h1 class="text-2xl font-bold mb-6">Analytics</h1>
+
+  @if (isLoading()) {
+    <p>Loading...</p>
+  } @else if (errorMessage()) {
+    <p class="text-error">{{ errorMessage() }}</p>
+  } @else if (analytics(); as a) {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div class="stat bg-base-200 rounded-lg">
+        <div class="stat-title">Total Earnings</div>
+        <div class="stat-value text-primary">€{{ a.totalEarnings.toFixed(2) }}</div>
+      </div>
+
+      <div class="stat bg-base-200 rounded-lg">
+        <div class="stat-title">Total Purchases</div>
+        <div class="stat-value">{{ a.totalPurchases }}</div>
+      </div>
+
+      <div class="stat bg-base-200 rounded-lg">
+        <div class="stat-title">Purchases (Last 30 Days)</div>
+        <div class="stat-value">{{ a.purchasesLast30Days }}</div>
+      </div>
+
+      <div class="stat bg-base-200 rounded-lg">
+        <div class="stat-title">Top Asset</div>
+        @if (a.topAsset) {
+          <div class="stat-value text-lg">{{ a.topAsset.title }}</div>
+          <div class="stat-desc">€{{ a.topAsset.totalEarned.toFixed(2) }} · {{ a.topAsset.purchaseCount }} sales</div>
+        } @else {
+          <div class="stat-desc">No sales yet</div>
+        }
+      </div>
+    </div>
+  }
+</div>

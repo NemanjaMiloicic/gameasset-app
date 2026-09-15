@@ -84,7 +84,7 @@ export class AssetList implements OnInit, OnDestroy {
         assetType: value.assetType || undefined,
         minPrice: value.minPrice ?? undefined,
         maxPrice: value.maxPrice ?? undefined,
-        isFree: value.isFree || undefined,
+        isFree: value.isFree ? true : undefined,
         tags: value.tags || undefined,
       },
     }));

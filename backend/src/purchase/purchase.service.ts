@@ -137,5 +137,74 @@ export class PurchaseService {
         };
     }
 
+    async getAuthorAnalytics(authorId: string) {
+        const purchases = await this._purchaseRepo.find({
+            where: {
+                asset: {
+                    author: {
+                        id: authorId,
+                    },
+                },
+            },
+            relations: {
+                asset: true,
+            },
+        });
+
+        const totalEarnings = purchases.reduce(
+            (sum, purchase) => sum + Number(purchase.pricePaid),
+            0,
+        );
+
+        const totalPurchases = purchases.length;
+
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const purchasesLast30Days = purchases.filter(
+            purchase => new Date(purchase.purchasedAt) >= thirtyDaysAgo,
+        ).length;
+
+        const assetStats = new Map<
+            string,
+            {
+                id: string;
+                title: string;
+                totalEarned: number;
+                purchaseCount: number;
+            }
+        >();
+
+        for (const purchase of purchases) {
+            const asset = purchase.asset;
+
+            if (!assetStats.has(asset.id)) {
+                assetStats.set(asset.id, {
+                    id: asset.id,
+                    title: asset.title,
+                    totalEarned: 0,
+                    purchaseCount: 0,
+                });
+            }
+
+            const stats = assetStats.get(asset.id)!;
+
+            stats.totalEarned += Number(purchase.pricePaid);
+            stats.purchaseCount++;
+        }
+
+        const topAsset =
+            Array.from(assetStats.values()).sort(
+                (a, b) => b.totalEarned - a.totalEarned,
+            )[0] ?? null;
+
+        return {
+            totalEarnings,
+            totalPurchases,
+            purchasesLast30Days,
+            topAsset,
+        };
+    }
+
 
 }

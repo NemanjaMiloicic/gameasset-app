@@ -13,6 +13,7 @@ import { LicenseService } from "src/license/license.service";
 import type {RawBodyRequest}  from "@nestjs/common";
 import { StripeService } from "src/stripe/stripe.service";
 import { Stripe } from "node_modules/stripe/cjs/stripe.core";
+import { RolesGuard } from "src/shared/guards/roles.guard";
 
 @Controller('purchases')
 export class PurchaseController {
@@ -118,6 +119,13 @@ export class PurchaseController {
       const currentUser: CurrentUserDto = { id: req.user.id, userRole: req.user.userRole };
       return await this._purchaseService.checkOwnership(params.id, currentUser);
    }
+
+   @Get('analytics/me')
+   @HttpCode(HttpStatus.OK)
+   @UseGuards(JwtAuthGuard, RolesGuard)
+    async getMyAnalytics(@Request() req) {
+        return this._purchaseService.getAuthorAnalytics(req.user.id);
+    }
 
 
 }

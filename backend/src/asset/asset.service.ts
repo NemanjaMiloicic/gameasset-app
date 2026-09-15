@@ -59,9 +59,11 @@ export class AssetService {
             query.andWhere('asset.assetType = :assetType', { assetType: dto.assetType });
         }
 
-        if (dto.isFree === 'true') {
+        if (dto.isFree === true) {
             query.andWhere('asset.price = 0');
-        } else {
+        } 
+        
+        else {
             if (dto.minPrice !== undefined) {
                 query.andWhere('asset.price >= :minPrice', { minPrice: dto.minPrice });
             }
