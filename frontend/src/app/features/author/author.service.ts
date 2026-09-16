@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PublicAuthorProfile } from './interfaces/public-author-profile.interface';
 import { AuthorAnalytics } from './interfaces/author-analytics.interface';
+import { AssetSalesBreakdown } from './interfaces/asset-sales-breakdown.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -36,5 +37,9 @@ export class AuthorService {
 
   getAnalytics(): Observable<AuthorAnalytics> {
     return this._http.get<AuthorAnalytics>(`${this._apiUrl}/purchases/analytics/me`);
+  }
+
+  getSalesBreakdown(): Observable<AssetSalesBreakdown[]> {
+    return this._http.get<AssetSalesBreakdown[]>(`${this._apiUrl}/purchases/analytics/me/breakdown`);
   }
 }

@@ -32,5 +32,29 @@
         }
       </div>
     </div>
+
+    @if (salesBreakdown().length > 0) {
+      <h2 class="text-xl font-bold mb-4">Sales by Asset</h2>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th>Sales</th>
+              <th>Earned</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of salesBreakdown(); track row.assetId) {
+              <tr>
+                <td>{{ row.title }}</td>
+                <td>{{ row.purchaseCount }}</td>
+                <td>€{{ row.totalEarned.toFixed(2) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   }
 </div>

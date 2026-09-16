@@ -6,6 +6,10 @@
   <div class="navbar-center hidden md:flex gap-2">
     <a routerLink="/assets" class="btn btn-ghost">Assets</a>
 
+    @if (isAuthenticated()) {
+      <a routerLink="/purchase/my" class="btn btn-ghost">My Purchases</a>
+    }
+
     @if (isAuthenticated() && (user()?.userRole === 'author' || user()?.userRole === 'admin')) {
       <a routerLink="/author/dashboard" class="btn btn-ghost">Author Dashboard</a>
     } @else {

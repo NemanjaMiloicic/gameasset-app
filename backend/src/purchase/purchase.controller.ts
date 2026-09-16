@@ -123,8 +123,15 @@ export class PurchaseController {
    @Get('analytics/me')
    @HttpCode(HttpStatus.OK)
    @UseGuards(JwtAuthGuard, RolesGuard)
-    async getMyAnalytics(@Request() req) {
+   async getMyAnalytics(@Request() req) {
         return this._purchaseService.getAuthorAnalytics(req.user.id);
+    }
+
+    @Get('analytics/me/breakdown')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    async getMySalesBreakdown(@Request() req) {
+        return this._purchaseService.getAssetSalesBreakdown(req.user.id);
     }
 
 

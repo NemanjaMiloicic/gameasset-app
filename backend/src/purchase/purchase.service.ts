@@ -206,5 +206,52 @@ export class PurchaseService {
         };
     }
 
+    async getAssetSalesBreakdown(authorId: string) {
+        const purchases = await this._purchaseRepo.find({
+            where: {
+                asset: {
+                    author: {
+                        id: authorId,
+                    },
+                },
+            },
+            relations: {
+                asset: true,
+            },
+        });
+
+        const assetStats = new Map<
+            string,
+            {
+                assetId: string;
+                title: string;
+                totalEarned: number;
+                purchaseCount: number;
+            }
+        >();
+
+        for (const purchase of purchases) {
+            const asset = purchase.asset;
+
+            if (!assetStats.has(asset.id)) {
+                assetStats.set(asset.id, {
+                    assetId: asset.id,
+                    title: asset.title,
+                    totalEarned: 0,
+                    purchaseCount: 0,
+                });
+            }
+
+            const stats = assetStats.get(asset.id)!;
+
+            stats.totalEarned += Number(purchase.pricePaid);
+            stats.purchaseCount++;
+        }
+
+        return Array.from(assetStats.values()).sort(
+            (a, b) => b.totalEarned - a.totalEarned,
+        );
+    }
+
 
 }
