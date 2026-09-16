@@ -43,13 +43,11 @@ export class AssetService {
         return await this._assetRepo.save(assetEntity);
     }
 
-    async findAll(dto: SearchAssetsDto): Promise<{ data: AssetEntity[]; total: number }> {
+   async findAll(dto: SearchAssetsDto): Promise<{ data: AssetEntity[]; total: number }> {
         const query = this._assetRepo.createQueryBuilder('asset')
             .leftJoinAndSelect('asset.author', 'author')
             .leftJoinAndSelect('asset.files', 'files')
-            .orderBy('asset.createdAt', 'DESC')
-            .skip(dto.skip)
-            .take(dto.limit);
+            .orderBy('asset.createdAt', 'DESC');
 
         if (dto.search) {
             query.andWhere('asset.title ILIKE :search', { search: `%${dto.search}%` });
@@ -61,9 +59,7 @@ export class AssetService {
 
         if (dto.isFree === true) {
             query.andWhere('asset.price = 0');
-        } 
-        
-        else {
+        } else {
             if (dto.minPrice !== undefined) {
                 query.andWhere('asset.price >= :minPrice', { minPrice: dto.minPrice });
             }
@@ -88,6 +84,8 @@ export class AssetService {
                 query.andWhere(`(${tagConditions})`, tagParams);
             }
         }
+
+        query.skip(dto.skip).take(dto.limit);
 
         const [data, total] = await query.getManyAndCount();
         return { data, total };

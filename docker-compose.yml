@@ -11,6 +11,35 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    container_name: gameasset-backend
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    restart: on-failure
+
+  frontend:
+    build: ./frontend
+    container_name: gameasset-frontend
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   pgdata:

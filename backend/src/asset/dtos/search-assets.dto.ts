@@ -8,6 +8,7 @@ export class SearchAssetsDto extends PaginationDto {
     search?: string;
 
     @IsOptional()
+    @Transform(({ value }) => (value === '' || value === null ? undefined : value))
     @IsString()
     assetType?: string;
 
@@ -24,7 +25,11 @@ export class SearchAssetsDto extends PaginationDto {
     maxPrice?: number;
 
     @IsOptional()
-    @Transform(({ value }) => value === 'true' || value === true)
+    @Transform(({ value }) => {
+        if (value === 'true' || value === true) return true;
+        if (value === 'false' || value === false) return false;
+        return undefined;
+    })
     @IsBoolean()
     isFree?: boolean;
 

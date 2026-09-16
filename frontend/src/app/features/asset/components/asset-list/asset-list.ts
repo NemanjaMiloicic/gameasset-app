@@ -38,28 +38,11 @@ export class AssetList implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    const search$ = this.filterForm.controls.search.valueChanges.pipe(
-      debounceTime(400),
-      distinctUntilChanged()
-    );
-
-    const tags$ = this.filterForm.controls.tags.valueChanges.pipe(
-      debounceTime(400),
-      distinctUntilChanged()
-    );
-
-    const price$ = merge(
-      this.filterForm.controls.minPrice.valueChanges,
-      this.filterForm.controls.maxPrice.valueChanges
-    ).pipe(debounceTime(400));
-
-    const instant$ = merge(
-      this.filterForm.controls.assetType.valueChanges,
-      this.filterForm.controls.isFree.valueChanges
-    );
-
-    merge(search$, tags$, price$, instant$)
-      .pipe(takeUntil(this._destroy$))
+    this.filterForm.valueChanges
+      .pipe(
+        debounceTime(300),
+        takeUntil(this._destroy$)
+      )
       .subscribe(() => {
         this.currentPage.set(0);
         this._loadAssets();
@@ -73,19 +56,22 @@ export class AssetList implements OnInit, OnDestroy {
     this._destroy$.complete();
   }
 
-  private _loadAssets(): void {
+ private _loadAssets(): void {
     const value = this.filterForm.value;
+    const selectedType = value.assetType && value.assetType.trim() !== '' 
+      ? value.assetType 
+      : undefined;
 
     this._store.dispatch(AssetActions.loadAssets({
       filters: {
         skip: this.currentPage() * this.limit,
         limit: this.limit,
-        search: value.search || undefined,
-        assetType: value.assetType || undefined,
+        search: value.search?.trim() || undefined,
+        assetType: selectedType,
         minPrice: value.minPrice ?? undefined,
         maxPrice: value.maxPrice ?? undefined,
         isFree: value.isFree ? true : undefined,
-        tags: value.tags || undefined,
+        tags: value.tags?.trim() || undefined,
       },
     }));
   }
