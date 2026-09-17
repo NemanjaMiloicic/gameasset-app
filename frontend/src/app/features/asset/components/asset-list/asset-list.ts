@@ -2,7 +2,7 @@ import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { merge, Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { merge, Subject, debounceTime, takeUntil } from 'rxjs';
 import * as AssetActions from '../../store/asset.actions';
 import { AssetCard } from '../asset-card/asset-card';
 import { selectAllAssets, selectAssetsLoading, selectAssetsTotal } from '../../store/asset.selectors';
@@ -38,7 +38,14 @@ export class AssetList implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.filterForm.valueChanges
+    merge(
+      this.filterForm.controls.search.valueChanges,
+      this.filterForm.controls.assetType.valueChanges,
+      this.filterForm.controls.minPrice.valueChanges,
+      this.filterForm.controls.maxPrice.valueChanges,
+      this.filterForm.controls.isFree.valueChanges,
+      this.filterForm.controls.tags.valueChanges
+    )
       .pipe(
         debounceTime(300),
         takeUntil(this._destroy$)
@@ -56,10 +63,10 @@ export class AssetList implements OnInit, OnDestroy {
     this._destroy$.complete();
   }
 
- private _loadAssets(): void {
+  private _loadAssets(): void {
     const value = this.filterForm.value;
-    const selectedType = value.assetType && value.assetType.trim() !== '' 
-      ? value.assetType 
+    const selectedType = value.assetType && value.assetType.trim() !== ''
+      ? value.assetType
       : undefined;
 
     this._store.dispatch(AssetActions.loadAssets({
