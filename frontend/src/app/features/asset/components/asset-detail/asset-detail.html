@@ -1,7 +1,7 @@
 <div class="max-w-4xl mx-auto mt-8 px-4">
   <button class="btn btn-ghost btn-sm mb-4" (click)="goBack()">← Back to Assets</button>
 
-  @if (assetWithOwnership(); as data) {
+  @if (pageData(); as data) {
     @if (data[0]; as a) {
       <div class="flex gap-6">
         <img [src]="a.previewImageUrl" [alt]="a.title" class="w-64 h-64 object-cover rounded-lg" />
@@ -47,6 +47,63 @@
             <button class="btn btn-primary" [disabled]="isProcessing()" (click)="onBuyPaid(a.id)">
               Buy Now
             </button>
+          }
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-base-300">
+          <h2 class="text-xl font-bold mb-2">Reviews</h2>
+
+          @if (data[4]; as rating) {
+            @if (rating.count > 0) {
+              <p class="text-sm text-base-content/70 mb-4">
+                ⭐ {{ rating.average.toFixed(1) }} / 5 ({{ rating.count }} reviews)
+              </p>
+            } @else {
+              <p class="text-sm text-base-content/70 mb-4">No reviews yet.</p>
+            }
+          }
+
+          @if (data[1].owned && !data[2]) {
+            <div class="flex flex-col gap-2 mb-6 p-4 bg-base-200 rounded-lg">
+              <label class="label">Rating</label>
+              <select [ngModel]="reviewRating()" (ngModelChange)="reviewRating.set(+$event)" class="select select-bordered w-32">
+                @for (n of [1,2,3,4,5]; track n) {
+                  <option [value]="n">{{ n }} ★</option>
+                }
+              </select>
+
+              <textarea
+                [ngModel]="reviewComment()"
+                (ngModelChange)="reviewComment.set($event)"
+                placeholder="Optional comment"
+                class="textarea textarea-bordered w-full"
+              ></textarea>
+
+              @if (reviewError()) {
+                <p class="text-error text-sm">{{ reviewError() }}</p>
+              }
+
+              <button class="btn btn-primary btn-sm w-fit" [disabled]="isSubmittingReview()" (click)="onSubmitReview(a.id)">
+                Submit Review
+              </button>
+            </div>
+          }
+
+          @for (review of data[3]; track review.id) {
+            <div class="border-b border-base-200 py-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="font-semibold">{{ review.author.username }}</span>
+                  <span class="text-sm text-base-content/60 ml-2">{{ review.rating }} ★</span>
+                </div>
+                @if (data[2] && data[2]!.id === review.id) {
+                  <button class="btn btn-ghost btn-xs" (click)="onDeleteReview(review.id)">Delete</button>
+                }
+              </div>
+              @if (review.comment) {
+                <p class="text-sm mt-1">{{ review.comment }}</p>
+              }
+            </div>
           }
         </div>
         </div>
