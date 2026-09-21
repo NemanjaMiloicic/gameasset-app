@@ -26,5 +26,31 @@
         </div>
       }
     </div>
+
+    @if (totalPages() > 1) {
+      <div class="flex justify-center items-center gap-2 mt-8">
+        <button class="btn btn-sm" [disabled]="currentPage() === 0" (click)="onPageChange(currentPage() - 1)">
+          «
+        </button>
+
+        @for (page of pageNumbers(); track $index) {
+          <button
+            class="btn btn-sm"
+            [class.btn-primary]="$index === currentPage()"
+            (click)="onPageChange($index)"
+          >
+            {{ $index + 1 }}
+          </button>
+        }
+
+        <button class="btn btn-sm" [disabled]="currentPage() >= totalPages() - 1" (click)="onPageChange(currentPage() + 1)">
+          »
+        </button>
+      </div>
+
+      <p class="text-center text-sm text-base-content/60 mt-2">
+        {{ total() }} assets found
+      </p>
+    }
   }
 </div>

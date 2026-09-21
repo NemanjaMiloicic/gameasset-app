@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { PurchaseService } from '../../purchase.service';
 import { Purchase } from '../../interfaces/purchase.interface';
 
@@ -8,25 +8,44 @@ import { Purchase } from '../../interfaces/purchase.interface';
   templateUrl: './my-purchases.html',
   styleUrl: './my-purchases.css',
 })
-export class MyPurchases {
-  
+export class MyPurchases implements OnInit {
   private readonly _purchaseService = inject(PurchaseService);
 
   purchases = signal<Purchase[]>([]);
   total = signal(0);
   isLoading = signal(true);
 
-  constructor() {
-    this._purchaseService.getMyPurchases(0, 20).subscribe({
-      next: (response) => {
-        this.purchases.set(response.data);
-        this.total.set(response.total);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.isLoading.set(false);
-      },
-    });
+  readonly limit = 3;
+  currentPage = signal(0);
+
+  totalPages = computed(() => Math.ceil(this.total() / this.limit));
+  pageNumbers = computed(() => Array.from({ length: this.totalPages() }));
+
+  ngOnInit(): void {
+    this._loadPurchases();
+  }
+
+  private _loadPurchases(): void {
+    this.isLoading.set(true);
+
+    this._purchaseService
+      .getMyPurchases(this.currentPage() * this.limit, this.limit)
+      .subscribe({
+        next: (response) => {
+          this.purchases.set(response.data);
+          this.total.set(response.total);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.isLoading.set(false);
+        },
+      });
+  }
+
+  onPageChange(page: number): void {
+    if (page < 0 || page >= this.totalPages()) return;
+    this.currentPage.set(page);
+    this._loadPurchases();
   }
 
   onDownload(purchaseId: string): void {
