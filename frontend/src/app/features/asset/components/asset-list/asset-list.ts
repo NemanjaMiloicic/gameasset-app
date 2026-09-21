@@ -2,7 +2,7 @@ import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { merge, Subject, debounceTime, takeUntil } from 'rxjs';
+import { merge, Subject, debounceTime, takeUntil, filter } from 'rxjs';
 import * as AssetActions from '../../store/asset.actions';
 import { AssetCard } from '../asset-card/asset-card';
 import { selectAllAssets, selectAssetsLoading, selectAssetsTotal } from '../../store/asset.selectors';
@@ -38,18 +38,24 @@ export class AssetList implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    merge(
-      this.filterForm.controls.search.valueChanges,
+    const searchChanges$ = this.filterForm.controls.search.valueChanges.pipe(
+      debounceTime(300),
+      filter(value => !value || value.trim().length >= 3)
+    );
+
+    const otherFiltersChanges$ = merge(
       this.filterForm.controls.assetType.valueChanges,
       this.filterForm.controls.minPrice.valueChanges,
       this.filterForm.controls.maxPrice.valueChanges,
       this.filterForm.controls.isFree.valueChanges,
-      this.filterForm.controls.tags.valueChanges
+      this.filterForm.controls.tags.valueChanges,
+    );
+
+    merge(
+      searchChanges$,
+      otherFiltersChanges$
     )
-      .pipe(
-        debounceTime(300),
-        takeUntil(this._destroy$)
-      )
+      .pipe(takeUntil(this._destroy$))
       .subscribe(() => {
         this.currentPage.set(0);
         this._loadAssets();

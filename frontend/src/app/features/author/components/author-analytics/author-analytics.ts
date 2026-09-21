@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
-import { interval, Subject, startWith, takeUntil } from 'rxjs';
+import { interval, Subject, startWith, takeUntil, switchMap, forkJoin } from 'rxjs';
 import { AuthorService } from '../../author.service';
 import { AuthorAnalytics } from '../../interfaces/author-analytics.interface';
 import { AssetSalesBreakdown } from '../../interfaces/asset-sales-breakdown.interface';
@@ -23,9 +23,25 @@ export class AuthorAnalyticsComponent implements OnInit, OnDestroy {
     interval(15000)
       .pipe(
         startWith(0),
-        takeUntil(this._destroy$)
+        switchMap(() => 
+          forkJoin({
+            analytics: this._authorService.getAnalytics(),
+            salesBreakdown: this._authorService.getSalesBreakdown(),
+          }),
+        ),
+        takeUntil(this._destroy$),
       )
-      .subscribe(() => this._loadData());
+      .subscribe({
+        next: ({ analytics, salesBreakdown }) => {
+          this.analytics.set(analytics);
+          this.salesBreakdown.set(salesBreakdown);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          this.errorMessage.set(err.error?.message ?? 'Failed to load analytics');
+          this.isLoading.set(false);
+        },
+      });
   }
 
   ngOnDestroy(): void {
@@ -33,20 +49,5 @@ export class AuthorAnalyticsComponent implements OnInit, OnDestroy {
     this._destroy$.complete();
   }
 
-  private _loadData(): void {
-    this._authorService.getAnalytics().subscribe({
-      next: (data) => {
-        this.analytics.set(data);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        this.errorMessage.set(err.error?.message ?? 'Failed to load analytics');
-        this.isLoading.set(false);
-      },
-    });
-
-    this._authorService.getSalesBreakdown().subscribe({
-      next: (data) => this.salesBreakdown.set(data),
-    });
-  }
+  
 }
